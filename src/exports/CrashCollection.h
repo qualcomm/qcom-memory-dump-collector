@@ -1,16 +1,5 @@
-
-// ----------------------------------------------------------------------------
-//
-// CrashCollection.h
-//
-/// class CrashCollection
-///
-/// @file
-//
-// Copyright (c) 2025 Qualcomm Technologies, Incorporated.
-// Qualcomm Proprietary.
-// All Rights Reserved.
-// ----------------------------------------------------------------------------
+// Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+// SPDX-License-Identifier: BSD 3-Clause Clear License
 #include <cstdint>
 #include <map>
 
