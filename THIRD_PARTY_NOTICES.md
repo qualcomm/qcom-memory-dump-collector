@@ -2,7 +2,7 @@
 
 `qmdc` (Qualcomm Memory Dump Collector) is distributed under the
 [BSD-3-Clause Clear License](LICENSE.txt) and incorporates or
-statically links the following third-party components. Each
+dynamically links the following third-party components. Each
 component is covered by its own license; those licenses remain in
 effect for the respective component and do **not** apply to
 `qmdc`'s own source code.
@@ -22,12 +22,11 @@ folder.
 - License          : **GNU Lesser General Public License v2.1 or later**
                      (LGPL-2.1-or-later). See
                      [`LICENSES/libusb-1.0-LGPL-2.1.txt`](LICENSES/libusb-1.0-LGPL-2.1.txt).
-- Link mode        : `qmdc` currently links libusb **statically**
-                     into `qmdc.exe` / `libQcDevice.a` on Windows
-                     and Linux. See
+- Link mode        : `qmdc` currently links libusb **dynamically**
+                     (`libusb-1.0.dll` on Windows, `libusb-1.0.so` on
+                     Linux). See
                      [`doc/LGPL-COMPLIANCE.md`](doc/LGPL-COMPLIANCE.md)
-                     for how static linking is handled for an
-                     open-source consumer and what downstream
+                     for LGPL compliance details and what downstream
                      redistributors of `qmdc` must do.
 
 > Notice required by LGPL §6: *This product uses libusb, a library
