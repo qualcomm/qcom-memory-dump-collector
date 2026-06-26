@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: BSD 3-Clause Clear License
 #include "CliArgumentDefinitions.h"
 #include "CliOptions.h"
-#include "CliParserUtil.h"
 #include "ExceptionHandler.h"
 #include "FileSystem.h"
 #include <KL/kLogger.h>
@@ -128,6 +127,24 @@ void CliArgumentDefinitions::initialize() {
         }
     };
 
+     argumentDefinitions["port-trace"] = {
+      "port-trace",
+      "Enable port trace logging output",
+      ArgumentType::FLAG,
+      ArgumentCategory::LOGGING,
+      "",
+      {},
+      false,
+      "qil --devices --port-trace",
+      "Shows detailed operation logs and debug information",
+      [](QC::CLI::CliOptions& options, const std::string& value) {
+         options.portTrace = true;
+         options.logOptions |= KL::LogOption::PtraceToFile;;
+         KL::Logger::get_instance().setOptions(options.logOptions);
+         KL::Logger::get_instance().setLevel(KL::Level::Data);
+      }
+   };
+
     // Command definitions
     commandDefinitions = {
         {
@@ -135,7 +152,8 @@ void CliArgumentDefinitions::initialize() {
             "List all available device identifiers",
             {},
             {
-                argumentDefinitions["verbose"]
+                argumentDefinitions["verbose"],
+                argumentDefinitions["port-trace"]
             },
             "qmdc --devices",
             CliOptions::CommandType::LIST_DEVICES,
@@ -149,7 +167,8 @@ void CliArgumentDefinitions::initialize() {
                 argumentDefinitions["path-name"],
             },
             {
-                argumentDefinitions["verbose"]
+                argumentDefinitions["verbose"],
+                argumentDefinitions["port-trace"]
             },
             "qmdc --crash-collection --device=<MSM_SERIAL_ID> --path-name=<PATH_TO_STORE_DUMP_FILES>",
             CliOptions::CommandType::COLLECT_MEMORY_DUMP,
@@ -186,26 +205,6 @@ void CliArgumentDefinitions::initialize() {
 
     initialized = true;
 }
-
-const std::string CliArgumentDefinitions::getValidOptions(const std::string &argument)
-{
-
-    std::string validOptions = " Valid options are <";
-    const auto& values = CliArgumentDefinitions::argumentDefinitions[argument].validValues;
-
-    for (size_t i = 0; i < values.size(); ++i)
-    {
-        validOptions += values[i];
-        if (i != values.size() - 1)  // Add comma only if not the last element
-        {
-            validOptions += ", ";
-        }
-    }
-
-    validOptions += ">";
-    return validOptions;
-}
-
 
 } // namespace CLI
 } // namespace QC

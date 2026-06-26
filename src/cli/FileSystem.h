@@ -88,20 +88,6 @@ public:
    static std::string joinPath(const std::string& base, const std::string& component);
 
    /**
-    * @brief Extract filename from path (cross-platform)
-    * @param path Full path
-    * @return Filename portion only
-    */
-   static std::string getFilename(const std::string& path);
-
-   /**
-    * @brief Extract directory path from full path (cross-platform)
-    * @param path Full path
-    * @return Directory portion only
-    */
-   static std::string getDirectoryPath(const std::string& path);
-
-   /**
     * @brief Check if path is absolute (cross-platform)
     * @param path Path to check
     * @return true if absolute path, false if relative
@@ -132,27 +118,11 @@ public:
    static bool isDirectoryWritable(const std::string& path);
 
    /**
-    * @brief Get platform-specific temporary directory paths in order of
-    * preference
-    * @return vector of temporary directory paths to try
-    */
-   static std::vector<std::string> getTempDirectoryPaths();
-
-   /**
     * @brief Remove a file with cross-platform support
     * @param path File path to remove
     * @return true if successful, false otherwise
     */
    static bool removeFile(const std::string& path);
-
-   /**
-    * @brief Create a temporary directory with proper permissions and fallback
-    * handling
-    * @param baseName Base name for the temporary directory
-    * @return path to created temporary directory, empty string if all attempts
-    * failed
-    */
-   static std::string createTempDirectory(const std::string& baseName);
 
 private:
    /**

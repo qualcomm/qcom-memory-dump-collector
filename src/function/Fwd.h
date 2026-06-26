@@ -16,9 +16,4 @@ typedef std::shared_ptr<MemoryDumpCollector> MemoryDumpCollectorPtr;
 
 class MemoryDumpCollectorEvent;
 
-class ImageTransfer;
-typedef std::shared_ptr<ImageTransfer> ImageTransferPtr;
-
-class ImageTransferEvent;
-
 } // namespace Function

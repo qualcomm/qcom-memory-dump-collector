@@ -68,7 +68,6 @@ Base::Base(const Communication::CommonIoPtr& pIo, const std::string& description
 , m_handle(INVALID_HANDLE)
 , m_state(STATE_DISCONNECTED)
 , m_mutex()
-, m_receivedPacketMutex()
 , m_lockClientId(NO_CLIENT_ID)
 , m_lockReason()
 , m_lockKey(PROTOCOL_NO_KEY)

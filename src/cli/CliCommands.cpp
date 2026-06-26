@@ -131,7 +131,6 @@ int CliCommands::listDevices() {
         std::list<QC::DeviceInfo> devices;
         try {
             devices = QC::DeviceDiscovery::getDeviceList();
-            CFLOG_INFO("Device enumeration completed. Found " + std::to_string(devices.size()) + " device(s).", true);
         } catch (const std::exception& e) {
             CFLOG_ERROR(std::string("Error getting device list: ") + e.what(), true);
             CFLOG_ERROR("Continuing with empty device list", true);
@@ -139,7 +138,22 @@ int CliCommands::listDevices() {
             CFLOG_ERROR("Unknown error getting device list", true);
             CFLOG_ERROR("Continuing with empty device list", true);
         }
-        
+
+        // Remove devices with no protocol available
+        devices.remove_if([](const QC::DeviceInfo& device) {
+            if(device.deviceHandle == 0) {
+                return true;
+            }
+            try {
+                std::list<QC::ProtocolInfo> protocolList = QC::DeviceDiscovery::getProtocolList(device.deviceHandle);
+                return protocolList.empty();
+            } catch (...) {
+                return true;
+            }
+        });
+
+        CFLOG_INFO("Device enumeration completed. Found " + std::to_string(devices.size()) + " device(s).", true);
+
         if (devices.empty()) {
             CFLOG_INFO(
             std::string("No devices found\n"
@@ -150,11 +164,11 @@ int CliCommands::listDevices() {
                         "4. Check if device drivers are installed"),
                 true
             );
-            
+
             QC::DeviceDiscovery::stopMonitoring();
             return 0;
         }
-        
+
         CFLOG_INFO("Available Devices:\n", true);
         
         for (auto& device : devices) {

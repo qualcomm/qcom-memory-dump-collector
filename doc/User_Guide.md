@@ -13,7 +13,6 @@ QMDC is a zipped package with list of below component bundled:
 
 * QMDC executable
 * QMDC User Guide
-* Qualcomm User Space Driver (install optional)
 
 ## Supported Operating Systems
 
@@ -30,7 +29,9 @@ QMDC is a zipped package with list of below component bundled:
 
 1. Download the zip package for your platform from [Qualcomm Software Center (QSC)](https://softwarecenter.qualcomm.com/) – Search for “Qualcomm Memory Dump Collector”<br>
 2. Unzip the downloaded zip package.<br>
-3. Driver installation(optional)- Installing Qualcomm user-space drivers is optional if the Qualcomm kernel drivers are already present. If drivers have not been installed, the user-space driver included in this package may be used as an alternative. Driver installation is a one-time process; please refer to the "README" provided with the accompanying user-space driver zip bundle for detailed installation instructions.<br>
+3. Driver installation (optional) - QMDC requires either kernel-space or user-space Qualcomm USB drivers to communicate with devices. Driver installation is a one-time process. Choose one of the following options:<br>
+   - **Kernel-space drivers (recommended):** Download and install the Qualcomm USB kernel drivers for your operating system from [GitHub releases](https://github.com/qualcomm/qcom-usb-kernel-drivers/releases).<br>
+   - **User-space drivers:** Alternatively, if kernel drivers are not suitable for your environment, install the user-space drivers from [GitHub releases](https://github.com/qualcomm/qcom-usb-userspace-drivers/releases).<br>
 
 # Usage
 
@@ -121,34 +122,39 @@ The following table lists all available arguments, their expected values, and de
 <tr><td style="white-space: nowrap;"><code>--device</code></td><td><code>&lt;ID&gt;</code></td><td>Specify target device identifier for device operation. Use <code>SERIAL NUMBER</code> or <code>ADB Serial Number</code> or <code>Device Description</code> from <code>--devices</code> command.</td></tr>
 <tr><td style="white-space: nowrap;"><code>--path-name</code></td><td><code>&lt;DIR_PATH&gt;</code></td><td>Absolute path for directory to store memory dump files.</td></tr>
 <tr><td style="white-space: nowrap;"><code>--verbose</code></td><td></td><td>Enable verbose logging output. Shows detailed operation logs and debug information.</td></tr>
+<tr><td style="white-space: nowrap;"><code>--port-trace</code></td><td></td><td>Enable port trace logging. Writes raw TX/RX data to port-trace files in the PtraceLogs directory for protocol-level debugging.</td></tr>
 </table>
 
 ## Logs
 
+### Debug Logs
 Debug logs capture detailed information about QMDC operations and can assist in troubleshooting. They can be found in the following location:
-### Linux
+#### Linux
 `/var/tmp/QFS/QMDC/Logs/`
 
-### Windows
+#### Windows
 `C:\ProgramData\QFS\QMDC\Logs`
 
-### WSL ###
-
+#### WSL ###
 `/var/tmp/QFS/QMDC/Logs/`
 
+### Port Trace Logs
+Port Trace logs can be found in the following location:
+#### Linux
+`/var/tmp/QFS/QMDC/PTraceLogs/`
+
+#### Windows
+`C:\ProgramData\QFS\QMDC\PTraceLogs`
+
+#### WSL ###
+`/var/tmp/QFS/QMDC/PTraceLogs/`
+
 ## Limitations
-
-1. **ADB Cannot Run Simultaneously with QMDC**
-
-   QMDC and ADB cannot access the same USB device simultaneously. Only one application can hold a handle to a USB device interface at a time. If ADB is running, stop it before using QMDC:
-
-   `adb kill-server`
-
-2. **Crash Mode Required**
+1. **Crash Mode Required**
 
    All QMDC device operations require the device to be in Crash mode. If the device is not in Crash mode, commands such as `./qmdc --devices` will not detect it. See the [Crash mode](#crash-mode) section for setup instructions.
 
-3. **Single Device at a Time**
+2. **Single Device at a Time**
 
    QMDC supports collecting memory dumps from only one device at a time. Multi-device parallel operations are not supported.
 
@@ -158,4 +164,8 @@ Below are some common issues and their solutions.
 
 1. QMDC reports that the device has not been found.
 
-    Please ensure Qualcomm Drivers have been installed. See the [Setup](#qmdc-setup) for details.
+   Please ensure Qualcomm Drivers have been installed. See the [Setup](#qmdc-setup) for details.
+
+   If drivers are installed and the device is still not detected, try stopping ADB. While QMDC can run alongside ADB in most cases, stopping the ADB server may help resolve detection issues:
+
+   `adb kill-server`

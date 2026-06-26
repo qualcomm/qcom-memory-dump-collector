@@ -160,8 +160,6 @@ protected:
    CallbackList m_asyncCallbacks; ///< All registered for async
    mutable std::recursive_mutex m_mutex;
 
-   std::recursive_mutex m_receivedPacketMutex;
-
    std::recursive_mutex m_lockMutex; ///< Protects lock configuration
    std::string m_lockReason;
    volatile int32_t m_lockClientId;

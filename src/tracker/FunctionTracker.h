@@ -263,7 +263,6 @@ inline std::string getAppBuildId()
       }                                                                                                                \
    );                                                                                                                  \
    m_lastError = __functionError;                                                                                      \
-   m_lastErrorString = __functionErrorString;                                                                          \
    switch(__functionError)                                                                                             \
    {                                                                                                                   \
       case Device::Exception::DEVICE_NO_ERROR:                                                                         \

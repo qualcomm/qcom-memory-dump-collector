@@ -26,7 +26,27 @@
 #include <windows.h>
 #else
 #include <unistd.h> // write, STDOUT_FILENO için
+#include <sys/stat.h> // chmod
 #endif
+
+// -----------------------------------------------------------------------------
+// LOG DIRECTORY MACROS
+// -----------------------------------------------------------------------------
+
+#if defined(_WIN32) || defined(_WIN64)
+#define BASE_DIR "C:\\ProgramData\\QFS\\QMDC\\"
+#define LOG_DIR BASE_DIR "Logs\\"
+#define PTRACE_DIR BASE_DIR "PTraceLogs\\"
+#define TMP_DIR BASE_DIR "Temp\\"
+
+#else
+#include <unistd.h> // write, STDOUT_FILENO için
+#define BASE_DIR "/var/tmp/QFS/QMDC/"
+#define LOG_DIR BASE_DIR "Logs/"
+#define PTRACE_DIR BASE_DIR "PTraceLogs/"
+#define TMP_DIR BASE_DIR "Temp/"
+#endif
+
 
 // TODO: Fix Signal Handler Undefined Behaviour
 // TODO: Fix Atomic/Mutex Data Race
@@ -184,27 +204,41 @@ public:
     * Safe to call multiple times. Should ideally be called once at program
     * startup.
     *
-    * @param folderPath Directory where log files will be stored. Empty =
+    * @param logFolderPath Directory where log files will be stored. Empty =
     * current working directory.
+    * @param ptraceFolderPath Directory where ptrace files will be stored. Empty =
     * @param maxLinesPerFile Maximum lines per file before rotation (default:
     * 100,000). Set to 0 for unlimited.
     * @param maxBytesPerFile Maximum bytes per file before rotation (default:
     * 0 = unlimited). File rotates when either limit is reached.
     */
-   void init(const std::string& folderPath = "", size_t maxLinesPerFile = KL::MAX_LOG_LINES, size_t maxBytesPerFile = 0, std::string appVersion = "")
-   {
-      std::call_once(mInitFlag, [this, folderPath, maxLinesPerFile, maxBytesPerFile, appVersion]() {
-         mMaxLines = maxLinesPerFile;
+void init(const std::string& logFolderPath = "", const std::string& ptraceFolderPath = PTRACE_DIR, size_t maxLinesPerFile = KL::MAX_LOG_LINES, size_t maxBytesPerFile = 0, std::string appVersion = "")   {
+      std::call_once(mInitFlag, [this, logFolderPath, ptraceFolderPath, maxLinesPerFile, maxBytesPerFile, appVersion]() {         mMaxLines = maxLinesPerFile;
          mMaxBytes = maxBytesPerFile;
          mAppVersion = appVersion;
 
-         // Resolve log directory
+         // Resolve debug log directory
          std::error_code ec;
-         mLogDirectory = folderPath.empty() ? std::filesystem::current_path() : std::filesystem::path(folderPath);
-         std::filesystem::create_directories(mLogDirectory, ec);
+         mLogDirectory = logFolderPath.empty() ? std::filesystem::current_path() : std::filesystem::path(logFolderPath);         std::filesystem::create_directories(mLogDirectory, ec);
          if(ec)
          {
             std::cerr << "[Logger] Failed to create log directory: " << ec.message() << std::endl;
+         }
+         else
+         {
+            set_directory_permissions(mLogDirectory);
+         }
+
+         // Resolve ptrace log directory
+         mPtraceDirectory = ptraceFolderPath.empty() ? std::filesystem::current_path() : std::filesystem::path(ptraceFolderPath);
+         std::filesystem::create_directories(mPtraceDirectory, ec);
+         if(ec)
+         {
+            std::cerr << "[Logger] Failed to create ptrace directory: " << ec.message() << std::endl;
+         }
+         else
+         {
+            set_directory_permissions(mPtraceDirectory);
          }
 
          // Performance: disable stream synchronization with C stdio
@@ -285,6 +319,8 @@ private:
    , mMaxLines(KL::MAX_LOG_LINES)
    , mMaxBytes(0)
    , mCurrentFileSize(0)
+   , mPtraceLineCount(0)
+   , mPtraceFileSize(0)
    , mIsRunning(false)
    {
    }
@@ -315,6 +351,12 @@ private:
          mFileStream.flush();
          mFileStream.close();
       }
+
+      if(mPtraceStream.is_open())
+      {
+         mPtraceStream.flush();
+         mPtraceStream.close();
+      }
    }
 
    void setup_signal_handlers()
@@ -325,11 +367,41 @@ private:
       std::signal(SIGILL, signal_handler);  // Illegal instruction
    }
 
+   /// Sets appropriate permissions on a directory after creation
+   /// Linux: chmod 0777 (rwxrwxrwx) - only if current user owns the directory
+   /// Windows: no-op, uses default inherited permissions
+   void set_directory_permissions(const std::filesystem::path& dir)
+   {
+#ifndef _WIN32
+      // Linux/Unix: Only attempt chmod if we own the directory
+      struct stat info;
+      if(stat(dir.c_str(), &info) == 0)
+      {
+         if(info.st_uid == getuid())
+         {
+            if(chmod(dir.c_str(), 0777) != 0)
+            {
+               std::cerr << "[Logger] Failed to set permissions on " << dir << std::endl;
+            }
+         }
+         // Silently skip if we don't own the directory - permissions were set by owner
+      }
+#else
+      // Windows: Use default inherited permissions (following QIL's approach)
+      (void)dir; // Suppress unused parameter warning
+#endif
+   }
+   
    void emergency_flush()
    {
       if(mFileStream.is_open())
       {
          mFileStream.flush();
+      }
+
+      if(mPtraceStream.is_open())
+      {
+         mPtraceStream.flush();
       }
    }
 
@@ -500,6 +572,12 @@ private:
                   write_to_file(fileBuffer);
                   write_to_console(lineBuffer, level);
                   break;
+               case KL::Sink::PtraceOnly:
+                  if (optionEnabled(LogOption::PtraceToFile))
+                  {
+                     write_to_ptrace(std::string(timeBuffer) + " " + entry.msg);
+                  }
+                  break;
             }
 
             localQueue.pop();
@@ -530,7 +608,28 @@ private:
       // Critical applications may want to log this to stderr
    }
 
+   /// Writes a line to the current ptrace log file, creating a new one if necessary
+   void write_to_ptrace(const std::string& msg)
+   {
+      // Check if rotation is needed - rotate when ANY limit is exceeded
+      bool needsRotation = !mPtraceStream.is_open()
+         || (mMaxLines > 0 && mPtraceLineCount >= mMaxLines)
+         || (mMaxBytes > 0 && mPtraceFileSize >= mMaxBytes);
 
+      if(needsRotation)
+      {
+         create_new_ptrace_file();
+      }
+
+      if(mPtraceStream.is_open())
+      {
+         mPtraceStream << msg << '\n';
+         ++mPtraceLineCount;
+         mPtraceFileSize += msg.length() + 1; // +1 for newline
+      }
+      // If file still not open → silently drop (disk full, permission, etc.)
+   }
+   
    void write_to_console(const std::string& lineBuffer, Level level)
    {
       // Lock internal console mutex for synchronization
@@ -649,6 +748,83 @@ private:
       mCurrentFileSize = 0;
    }
 
+    /// Closes current ptrace file and opens a new one with timestamped name
+   void create_new_ptrace_file()
+   {
+      if(mPtraceStream.is_open())
+      {
+         mPtraceStream.flush();
+         mPtraceStream.close();
+      }
+
+      ++mPtraceFileSequence;
+      const auto now = std::chrono::system_clock::now();
+      const auto time_t_val = std::chrono::system_clock::to_time_t(now);
+      const auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()) % 1000;
+
+      std::tm tm_val{};
+#if defined(_WIN32)
+      localtime_s(&tm_val, &time_t_val);
+#else
+      localtime_r(&time_t_val, &tm_val);
+#endif
+
+      // Get current process ID
+#ifdef _WIN32
+      DWORD pid = GetCurrentProcessId();
+#else
+      pid_t pid = getpid();
+#endif
+
+      char filename[128];
+
+      if(mPtraceFileSequence == 1)
+      {
+         std::snprintf(
+            filename,
+            sizeof(filename),
+            "qmdc_%02d_%02d_%04d_%02d_%02d_%02d_%03d_%s_PID_%d_START_1.ptrace",
+            tm_val.tm_mday,
+            tm_val.tm_mon + 1,
+            tm_val.tm_year + 1900,
+            tm_val.tm_hour,
+            tm_val.tm_min,
+            tm_val.tm_sec,
+            static_cast<int>(ms.count()),
+            mAppVersion.c_str(),
+            static_cast<int>(pid)
+         );
+      } else
+      {
+         std::snprintf(
+            filename,
+            sizeof(filename),
+            "qmdc_%02d_%02d_%04d_%02d_%02d_%02d_%03d_%s_PID_%d_%zu.ptrace",
+            tm_val.tm_mday,
+            tm_val.tm_mon + 1,
+            tm_val.tm_year + 1900,
+            tm_val.tm_hour,
+            tm_val.tm_min,
+            tm_val.tm_sec,
+            static_cast<int>(ms.count()),
+            mAppVersion.c_str(),
+            static_cast<int>(pid),
+            mPtraceFileSequence
+         );
+      }
+
+      const std::filesystem::path fullPath = mPtraceDirectory / filename;
+      mPtraceStream.open(fullPath, std::ios::out | std::ios::app);
+
+      if(!mPtraceStream.is_open())
+      {
+         std::cerr << "[Logger] CRITICAL: Failed to open ptrace file: " << fullPath << std::endl;
+      }
+
+      mPtraceLineCount = 0;
+      mPtraceFileSize = 0;
+   }
+
    // Member variables
    std::queue<LogEntry> mLogEntryQueue;
    std::condition_variable mCV;
@@ -670,6 +846,13 @@ private:
    std::mutex m_consoleMutex; // Internal mutex for synchronizing console output
    size_t mFileSequence{0};
    std::string mAppVersion;
+
+   // Ptrace log file tracking
+   std::filesystem::path mPtraceDirectory;
+   std::ofstream mPtraceStream;
+   size_t mPtraceLineCount{0};
+   size_t mPtraceFileSize{0};
+   size_t mPtraceFileSequence{0};
 };
 
 } // namespace KL

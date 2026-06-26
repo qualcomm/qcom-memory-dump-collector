@@ -69,15 +69,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Rpc\ImageManagementServiceHandler.cpp">
-      <Filter>Source Files\Rpc</Filter>
-    </ClCompile>
-    <ClCompile Include="Rpc\ImageManagementServiceTypes.cpp">
-      <Filter>Source Files\Rpc</Filter>
-    </ClCompile>
-    <ClCompile Include="Function\ImageTransfer.cpp">
-      <Filter>Source Files\Function</Filter>
-    </ClCompile>
     <ClCompile Include="Callback\ClientCallbackHandler.cpp">
       <Filter>Source Files\Callback</Filter>
     </ClCompile>
@@ -123,9 +114,6 @@
     <ClCompile Include="Function\MemoryDumpCollector.cpp">
       <Filter>Source Files\Function</Filter>
     </ClCompile>
-    <ClCompile Include="Rpc\DeviceManagerHandler.cpp">
-      <Filter>Source Files\Rpc</Filter>
-    </ClCompile>
     <ClCompile Include="CrashCollection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -138,16 +126,19 @@
     <ClCompile Include="util\ThisThread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="service\DeviceManagerHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="service\ImageManagementServiceHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="service\ImageManagementServiceTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Exports\ImageManagementDefinitions.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Rpc\ImageManagementServiceHandler.h">
-      <Filter>Header Files\Rpc</Filter>
-    </ClInclude>
-    <ClInclude Include="Function\ImageTransfer.h">
-      <Filter>Header Files\Function</Filter>
     </ClInclude>
     <ClInclude Include="Callback\ClientCallbackHandler.h">
       <Filter>Header Files\Callback</Filter>
@@ -224,15 +215,6 @@
     <ClInclude Include="Globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Rpc\Service.h">
-      <Filter>Header Files\Rpc</Filter>
-    </ClInclude>
-    <ClInclude Include="Rpc\DeviceManagerHandler.h">
-      <Filter>Header Files\Rpc</Filter>
-    </ClInclude>
-    <ClInclude Include="Rpc\Fwd.h">
-      <Filter>Header Files\Rpc</Filter>
-    </ClInclude>
     <ClInclude Include="Exports\CrashCollection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -295,6 +277,18 @@
     </ClInclude>
     <ClInclude Include="function\Fwd.h">
       <Filter>Header Files\Function</Filter>
+    </ClInclude>
+    <ClInclude Include="service\DeviceManagerHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="service\Fwd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="service\ImageManagementServiceHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="service\Service.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

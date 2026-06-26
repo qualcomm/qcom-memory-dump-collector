@@ -155,26 +155,6 @@ std::string FileSystem::joinPath(const std::string& base, const std::string& com
    return result + PATH_SEPARATOR + comp;
 }
 
-std::string FileSystem::getFilename(const std::string& path)
-{
-   if(path.empty())
-   {
-      return "";
-   }
-
-   // Find the last path separator
-   size_t lastSeparator = path.find_last_of("/\\");
-   if(lastSeparator == std::string::npos)
-   {
-      // No separator found, entire path is filename
-      return path;
-   }
-
-   // Return everything after the last separator
-   return path.substr(lastSeparator + 1);
-}
-
-
 bool FileSystem::isAbsolutePath(const std::string& path)
 {
    if(path.empty())
@@ -349,76 +329,6 @@ bool FileSystem::isDirectoryWritable(const std::string& path)
    return success;
 }
 
-std::vector<std::string> FileSystem::getTempDirectoryPaths()
-{
-   std::vector<std::string> tempPaths;
-
-#ifdef TOOLS_TARGET_WINDOWS
-   // Windows temporary directory paths in order of preference
-   char tempPath[MAX_PATH];
-
-   // Try GetTempPath first (usually C:\Users\<user>\AppData\Local\Temp)
-   if(GetTempPathA(MAX_PATH, tempPath) > 0)
-   {
-      std::string path = tempPath;
-      // Remove trailing backslash if present
-      if(!path.empty() && path.back() == '\\')
-      {
-         path.pop_back();
-      }
-      tempPaths.push_back(path);
-   }
-
-   // Fallback options for Windows
-   const char* envVars[] = {"TEMP", "TMP", "USERPROFILE"};
-   for(const char* envVar: envVars)
-   {
-      const char* envPath = getenv(envVar);
-      if(envPath && strlen(envPath) > 0)
-      {
-         std::string path = envPath;
-         if(envVar == std::string("USERPROFILE"))
-         {
-            path = joinPath(path, "AppData\\Local\\Temp");
-         }
-         tempPaths.push_back(path);
-      }
-   }
-
-   // Last resort for Windows
-   tempPaths.push_back("C:\\Temp");
-   tempPaths.push_back(".");
-
-#elif defined(TOOLS_TARGET_LINUX)
-   // Linux temporary directory paths in order of preference
-   tempPaths.push_back("/tmp");
-   tempPaths.push_back("/var/tmp");
-
-   // Try environment variables
-   const char* envVars[] = {"TMPDIR", "TMP", "TEMP"};
-   for(const char* envVar: envVars)
-   {
-      const char* envPath = getenv(envVar);
-      if(envPath && strlen(envPath) > 0)
-      {
-         tempPaths.push_back(envPath);
-      }
-   }
-
-   // User home directory as fallback
-   const char* home = getenv("HOME");
-   if(home && strlen(home) > 0)
-   {
-      tempPaths.push_back(joinPath(home, "tmp"));
-   }
-
-   // Last resort
-   tempPaths.push_back(".");
-#endif
-
-   return tempPaths;
-}
-
 bool FileSystem::removeFile(const std::string& path)
 {
    if(path.empty() || !fileExists(path))
@@ -431,68 +341,6 @@ bool FileSystem::removeFile(const std::string& path)
 #elif defined(TOOLS_TARGET_LINUX)
    return unlink(path.c_str()) == 0;
 #endif
-}
-
-std::string FileSystem::createTempDirectory(const std::string& baseName)
-{
-   std::vector<std::string> tempBasePaths = getTempDirectoryPaths();
-
-   for(const std::string& basePath: tempBasePaths)
-   {
-      // Skip if base path doesn't exist
-      if(!isDirectory(basePath))
-      {
-         continue;
-      }
-
-      std::string tempDir = joinPath(basePath, baseName);
-
-      // Try to create the directory
-      if(createDirectory(tempDir))
-      {
-         // Verify the directory was created and is writable
-         if(isDirectory(tempDir) && isDirectoryWritable(tempDir))
-         {
-            return tempDir;
-         }
-      }
-   }
-
-   // If all attempts failed, return empty string
-   return "";
-}
-
-std::string FileSystem::getDirectoryPath(const std::string& filePath)
-{
-   // Handle empty input
-   if(filePath.empty())
-   {
-      return "";
-   }
-
-   // Find last directory separator
-   size_t pos = filePath.find_last_of("/\\");
-
-   // No separator found = file in current directory
-   if(pos == std::string::npos)
-   {
-      return "./";
-   }
-
-   // Special case: root path (e.g., "/file" → "/")
-   if(pos == 0 && filePath[0] == '/')
-   {
-      return "/";
-   }
-
-   // Windows drive root (e.g., "C:\\file" → "C:\\")
-   if(pos == 2 && filePath.length() > 2 && filePath[1] == ':' && (filePath[2] == '\\' || filePath[2] == '/'))
-   {
-      return filePath.substr(0, 3);
-   }
-
-   // Return path up to and including last separator
-   return filePath.substr(0, pos + 1);
 }
 
 // ========== Platform-Specific Implementations ==========

@@ -13,12 +13,6 @@
     <ClCompile Include="CliParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CliParserUtil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Common\Source\Cpp\Exception\ExceptionHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FileSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -34,6 +28,7 @@
     <ClCompile Include="Spinner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ExceptionHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CliArgumentDefinitions.h">
@@ -54,9 +49,6 @@
     <ClInclude Include="CliParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CliParserUtil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="FileSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -69,6 +61,8 @@
     <ClInclude Include="Spinner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Exception.h" />
+    <ClInclude Include="ExceptionHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">

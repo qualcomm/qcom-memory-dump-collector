@@ -96,9 +96,9 @@
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>
       </SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;TOOLS_TARGET_WINDOWS;LIBXML_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;TOOLS_TARGET_WINDOWS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>exports;external\kLogger\include;qds\qds_win;external\libxml2-win-build\include;external\libiconv-win-build\include;.</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>exports;external\kLogger\include;qds\qds_win;.</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
@@ -109,8 +109,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>QcDevice.lib;Rpcrt4.lib;setupapi.lib;Shlwapi.lib;libxml2-static.lib;libiconv-static.lib;libz-static.lib;liblzma-static.lib;ws2_32.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)Builds\$(Platform)\$(Configuration)\lib\;$(SolutionDir)src\external\libxml2-win-build\build\$(Platform)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>QcDevice.lib;Rpcrt4.lib;setupapi.lib;Shlwapi.lib;ws2_32.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Builds\$(Platform)\$(Configuration)\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/IGNORE:4006</AdditionalOptions>
     </Lib>
     <PostBuildEvent>
@@ -124,9 +124,9 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>
       </SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;TOOLS_TARGET_WINDOWS;LIBXML_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;TOOLS_TARGET_WINDOWS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>exports;external\kLogger\include;qds\qds_win;external\libxml2-win-build\include;external\libiconv-win-build\include;.</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>exports;external\kLogger\include;qds\qds_win;.</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
@@ -139,8 +139,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>QcDevice.lib;Rpcrt4.lib;setupapi.lib;Shlwapi.lib;libxml2-static.lib;libiconv-static.lib;libz-static.lib;liblzma-static.lib;ws2_32.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)Builds\$(Platform)\$(Configuration)\lib\;$(SolutionDir)src\external\libxml2-win-build\build\$(Platform)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>QcDevice.lib;Rpcrt4.lib;setupapi.lib;Shlwapi.lib;ws2_32.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Builds\$(Platform)\$(Configuration)\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
       <AdditionalOptions>/IGNORE:4006</AdditionalOptions>
     </Lib>
@@ -153,9 +153,9 @@
       <WarningLevel>Level4</WarningLevel>
       <SDLCheck>
       </SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;TOOLS_TARGET_WINDOWS;LIBXML_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;TOOLS_TARGET_WINDOWS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>exports;external\kLogger\include;qds\qds_win;external\libxml2-win-build\include;external\libiconv-win-build\include;.</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>exports;external\kLogger\include;qds\qds_win;.</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
@@ -166,8 +166,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>QcDevice.lib;Rpcrt4.lib;setupapi.lib;Shlwapi.lib;libxml2-static.lib;libiconv-static.lib;libz-static.lib;liblzma-static.lib;ws2_32.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)Builds\$(Platform)\$(Configuration)\lib\;$(SolutionDir)src\external\libxml2-win-build\build\$(Platform)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>QcDevice.lib;Rpcrt4.lib;setupapi.lib;Shlwapi.lib;ws2_32.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Builds\$(Platform)\$(Configuration)\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>/IGNORE:4006</AdditionalOptions>
     </Lib>
     <PostBuildEvent>
@@ -181,9 +181,9 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>
       </SDLCheck>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;TOOLS_TARGET_WINDOWS;LIBXML_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_HAS_STD_BYTE=0;WIN32_LEAN_AND_MEAN;NOMINMAX;NOGDI;TOOLS_TARGET_WINDOWS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>exports;external\kLogger\include;qds\qds_win;external\libxml2-win-build\include;external\libiconv-win-build\include;.</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>exports;external\kLogger\include;qds\qds_win;.</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ExceptionHandling>Async</ExceptionHandling>
       <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
@@ -196,8 +196,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>QcDevice.lib;Rpcrt4.lib;setupapi.lib;Shlwapi.lib;libxml2-static.lib;libiconv-static.lib;libz-static.lib;liblzma-static.lib;ws2_32.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)Builds\$(Platform)\$(Configuration)\lib\;$(SolutionDir)src\external\libxml2-win-build\build\$(Platform)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>QcDevice.lib;Rpcrt4.lib;setupapi.lib;Shlwapi.lib;ws2_32.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Builds\$(Platform)\$(Configuration)\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
       <AdditionalOptions>/IGNORE:4006</AdditionalOptions>
     </Lib>
@@ -220,12 +220,11 @@
     <ClCompile Include="report\DataContainer.cpp" />
     <ClCompile Include="report\StatusManager.cpp" />
     <ClCompile Include="report\Thread.cpp" />
-    <ClCompile Include="rpc\DeviceManagerHandler.cpp" />
+    <ClCompile Include="service\DeviceManagerHandler.cpp" />
     <ClCompile Include="tracker\FunctionTracker.cpp" />
-    <ClCompile Include="function\ImageTransfer.cpp" />
     <ClCompile Include="function\MemoryDumpCollector.cpp" />
-    <ClCompile Include="rpc\ImageManagementServiceHandler.cpp" />
-    <ClCompile Include="rpc\ImageManagementServiceTypes.cpp" />
+    <ClCompile Include="service\ImageManagementServiceHandler.cpp" />
+    <ClCompile Include="service\ImageManagementServiceTypes.cpp" />
     <ClCompile Include="CrashCollection.cpp" />
     <ClCompile Include="util\Event.cpp" />
     <ClCompile Include="util\ThisThread.cpp" />
@@ -251,7 +250,6 @@
     <ClInclude Include="exports\ImageManagementDefinitions.h" />
     <ClInclude Include="exports\CrashCollection.h" />
     <ClInclude Include="function\Fwd.h" />
-    <ClInclude Include="function\ImageTransfer.h" />
     <ClInclude Include="function\MemoryDumpCollector.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="platform\Assertions.h" />
@@ -266,10 +264,10 @@
     <ClInclude Include="report\Fwd.h" />
     <ClInclude Include="report\StatusManager.h" />
     <ClInclude Include="report\Thread.h" />
-    <ClInclude Include="rpc\DeviceManagerHandler.h" />
-    <ClInclude Include="rpc\Fwd.h" />
-    <ClInclude Include="rpc\ImageManagementServiceHandler.h" />
-    <ClInclude Include="rpc\Service.h" />
+    <ClInclude Include="service\DeviceManagerHandler.h" />
+    <ClInclude Include="service\Fwd.h" />
+    <ClInclude Include="service\ImageManagementServiceHandler.h" />
+    <ClInclude Include="service\Service.h" />
     <ClInclude Include="tracker\FunctionTracker.h" />
     <ClInclude Include="util\AppEvent.h" />
     <ClInclude Include="util\AppMessage.h" />

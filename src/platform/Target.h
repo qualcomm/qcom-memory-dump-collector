@@ -58,8 +58,9 @@
           // Windows.
 #endif
 
-
+#ifndef TOOLS_ARCH_64BIT
 #define TOOLS_ARCH_64BIT
+#endif
 
 #elif defined _WIN32 // _Win32 is ALWAYS define, even on 64 bit, so test for 64
                      // bit first
@@ -107,7 +108,9 @@
           // IE.
 #endif
 
+#ifndef TOOLS_ARCH_32BIT
 #define TOOLS_ARCH_32BIT
+#endif
 
 #else
 #error Unknown Target

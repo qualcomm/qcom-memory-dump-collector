@@ -453,6 +453,10 @@ public:
       {
          switch(KL::Level(level))
          {
+            case KL::Level::Data:
+               PTRACE_LOG(("QDS: " + std::string(pMessage)).c_str());
+               break;
+
             case KL::Level::Debug:
                FLOG_DEBUG(("QDS: " + std::string(pMessage)).c_str());
                break;
@@ -2422,110 +2426,6 @@ Manager::DeviceList Manager::getDisconnectedDeviceList() const
 }
 
 // ----------------------------------------------------------------------------
-// mergeDevice
-//
-/// Move all protocols from one device to another
-// ----------------------------------------------------------------------------
-void Manager::mergeDevice(DeviceHandle sourceHandle, DeviceHandle destinationHandle)
-{
-   bool bSrcConnected = false;
-   bool bDestConnected = false;
-   bool bConnectedProtocolMerged = false;
-
-   std::lock_guard<std::recursive_mutex> lock(m_deviceManagerMutex);
-   DeviceList::iterator src = m_devices.find(sourceHandle);
-   if(m_devices.end() == src)
-   {
-      src = m_disconnectedDevices.find(sourceHandle);
-      TOOLS_ASSERT_OR_THROW(
-         m_disconnectedDevices.end() != src,
-         Device::Exception(
-            Device::Exception::DEVICE_INVALID_DEVICE_HANDLE,
-            "Could not find source device handle: " + std::to_string(sourceHandle)
-         )
-      );
-   }
-   else
-   {
-      bSrcConnected = true;
-   }
-
-   DeviceList::iterator dest = m_devices.find(destinationHandle);
-   if(m_devices.end() == dest)
-   {
-      dest = m_disconnectedDevices.find(destinationHandle);
-      TOOLS_ASSERT_OR_THROW(
-         m_disconnectedDevices.end() != dest,
-         Device::Exception(
-            Device::Exception::DEVICE_INVALID_DEVICE_HANDLE,
-            "Could not find destination device handle: " + std::to_string(destinationHandle)
-         )
-      );
-   }
-   else
-   {
-      bDestConnected = true;
-   }
-
-   Device::Impl::ProtocolList::const_iterator itP = src->second->m_protocols.begin();
-   Device::Impl::ProtocolList::const_iterator endP = src->second->m_protocols.end();
-   for(; itP != endP; ++itP)
-   {
-      bConnectedProtocolMerged = true;
-      src->second->moveProtocolOut(*itP, true);
-      dest->second->moveProtocolIn(*itP, true);
-   }
-
-   itP = src->second->m_unavailableProtocols.begin();
-   endP = src->second->m_unavailableProtocols.end();
-   for(; itP != endP; ++itP)
-   {
-      src->second->moveProtocolOut(*itP, false);
-      dest->second->moveProtocolIn(*itP, false);
-   }
-
-   if(bSrcConnected)
-   {
-      m_devices.erase(src);
-      FLOG_INFO(("<<<<==-== Deleted device " + std::to_string(src->second->getHandle()) +
-                 " : "
-                 "uniqueIdentifier: " +
-                 src->second->getUniqueIdentifier() +
-                 " : "
-                 "parentDescription: " +
-                 src->second->getDescription())
-                   .c_str());
-      notifyAsync(std::make_shared<DeviceDisconnectEvent>(src->second));
-   }
-   else
-   {
-      m_disconnectedDevices.erase(src);
-   }
-
-   if(!bDestConnected && bConnectedProtocolMerged)
-   {
-      notifyAsync(std::make_shared<DeviceConnectEvent>(dest->second));
-      FLOG_INFO(("==-==>>>> Device reconnect " + std::to_string(dest->second->getHandle()) +
-                 " : "
-                 "uniqueIdentifier: " +
-                 dest->second->getUniqueIdentifier() +
-                 " : "
-                 "parentDescription: " +
-                 dest->second->getDescription() +
-                 " : "
-                 "devicePath: " +
-                 dest->second->getDevicePath() +
-                 " : "
-                 "serialNumberMsm: " +
-                 dest->second->getSerialNumberMsm() +
-                 " : "
-                 "serialNumberAdb: " +
-                 dest->second->getSerialNumberAdb())
-                   .c_str());
-   }
-}
-
-// ----------------------------------------------------------------------------
 // getDeviceByHandle
 //
 /// @returns The device object for the corresponding handle
@@ -2584,55 +2484,6 @@ ImplPtr Manager::getDeviceBySerialNumber(const std::string& serialNumberMsm, con
    }
 
    return NULL;
-}
-
-// ----------------------------------------------------------------------------
-// getTcpDeviceByDevicePath
-//
-/// @returns The TCP device object with identical TCP device Path only.
-/// This function is limited for TCP device pairing use case only
-/// Do not enhance this function for I/O type of devices
-// ----------------------------------------------------------------------------
-ImplPtr Manager::getTcpDeviceByDevicePath(const std::string& devicePath)
-{
-   if(devicePath.empty())
-   {
-      // FLOG_WARNING( "Device Path is not set.");
-      return nullptr;
-   }
-
-   waitForInitialDeviceList();
-   std::lock_guard<std::recursive_mutex> lock(m_deviceManagerMutex);
-   DeviceList::iterator it = m_devices.begin();
-   DeviceList::iterator end = m_devices.end();
-
-   for(; it != end; ++it)
-   {
-      // if the device has adb and msm serial number skip the IP based grouping
-      // as this
-      if(it->second->getSerialNumberAdb().empty() && it->second->getSerialNumberMsm().empty())
-      {
-         if(isDevicePathMatched(it->second, devicePath))
-         {
-            return it->second;
-         }
-      }
-   }
-   it = m_disconnectedDevices.begin();
-   end = m_disconnectedDevices.end();
-
-   for(; it != end; ++it)
-   {
-      if(it->second->getSerialNumberAdb().empty() && it->second->getSerialNumberMsm().empty())
-      {
-         if(isDevicePathMatched(it->second, devicePath))
-         {
-            return it->second;
-         }
-      }
-   }
-   // FLOG_WARNING( "No matching device found for Device Path = " + devicePath);
-   return nullptr;
 }
 
 // ----------------------------------------------------------------------------
@@ -3507,18 +3358,6 @@ void Manager::removeAllClientFilePaths()
 }
 
 // ----------------------------------------------------------------------------
-// mhiForceEdl
-//
-/// MHI kick start
-// ----------------------------------------------------------------------------
-void Manager::mhiForceEdl(int32_t instance, const std::string& programmerPath)
-{
-   TOOLS_UNUSED_PARAMETER(instance);
-   TOOLS_UNUSED_PARAMETER(programmerPath);
-   TOOLS_THROW(ToolException("MHI EDL switch feature not supported"));
-}
-
-// ----------------------------------------------------------------------------
 // isMemoryUsageCritical
 //
 /// Check if system memory usage is critical.
@@ -3559,42 +3398,6 @@ void Manager::removeConnectedDevice(const DeviceHandle deviceHandle)
 
    m_devices.erase(it);
    FLOG_INFO("Removed from connected devices list");
-}
-
-// ----------------------------------------------------------------------------
-// removeDeviceEntry
-//
-/// cleanup entry for given device handle from the disconnected devices list
-// ----------------------------------------------------------------------------
-void Manager::removeDeviceEntry(const DeviceHandle deviceHandle)
-{
-   FLOG_INFO("Started cleanup for device Handle: " + std::to_string(deviceHandle));
-   std::lock_guard<std::recursive_mutex> lock(m_deviceManagerMutex);
-
-   Manager::DeviceList::const_iterator it;
-   it = m_devices.find(deviceHandle);
-   TOOLS_ASSERT_OR_THROW(
-      m_devices.end() == it,
-      Device::Exception(
-         Device::Exception::DEVICE_INVALID_DEVICE_HANDLE,
-         "Device in connected devices list: " + std::to_string(deviceHandle)
-      )
-   );
-
-   it = m_disconnectedDevices.find(deviceHandle);
-   TOOLS_ASSERT_OR_THROW(
-      m_disconnectedDevices.end() != it,
-      Device::Exception(
-         Device::Exception::DEVICE_INVALID_DEVICE_HANDLE,
-         "No entry for given device handle "
-         "in disconnected devices list: " +
-            std::to_string(deviceHandle)
-      )
-   );
-   m_disconnectedDevices.erase(it);
-   FLOG_INFO("Removed from disconnected devices list");
-
-   return;
 }
 
 } // namespace Device

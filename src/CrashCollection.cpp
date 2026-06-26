@@ -3,7 +3,7 @@
 #include <KL/kLogger.h>
 #include "Globals.h"
 #include "CrashCollection.h"
-#include "rpc/ImageManagementServiceHandler.h"
+#include "service/ImageManagementServiceHandler.h"
 #include "tracker/FunctionTracker.h"
 #include <iostream>
 

@@ -17,6 +17,8 @@
 #include <chrono>
 #include <memory>
 
+#include "KL/Macros.h"
+
 namespace Device {
 namespace Protocol {
 
@@ -273,16 +275,15 @@ private:
       if(pBuffer != nullptr)
       {
          std::lock_guard<std::recursive_mutex> lock(m_incomingPacketQueueMutex);
-         // FLOG_DATA(
-         //    "Rx size: " +
-         //    std::string(std::to_string(pBuffer->size()).c_str()), pBuffer,
-         //    DataType::Rx
-         // );
+         
+         PTRACE_LOG(
+            "Rx size: " +
+            std::string(std::to_string(pBuffer->size()).c_str()) + Util::bufferToHex(pBuffer)
+         );
 
          m_incomingPackets.push_back(pBuffer);
          incrementSize();
-         // FLOG_TRACE("Sahara bytes incomming. Size:" +
-         // Lang::atom_cast<Lang::String>(pBuffer->size()));
+         FLOG_DEBUG("Sahara bytes incoming. Size:" + std::to_string(pBuffer->size()));
          m_rxWorkerEvent.signal();
       }
    }
@@ -461,16 +462,6 @@ void Sahara::connect(const int32_t clientId)
 // ----------------------------------------------------------------------------
 // disconnect
 //
-/// Disconnects the io
-// ----------------------------------------------------------------------------
-void Sahara::doDisconnect()
-{
-   m_pIo->close();
-}
-
-// ----------------------------------------------------------------------------
-// disconnect
-//
 /// Disconnects the protocol
 // ----------------------------------------------------------------------------
 void Sahara::disconnect(const int32_t clientId)
@@ -572,11 +563,8 @@ Base::TransactionId Sahara::sendAsync(const Device::SharedByteBufferPtr& pBuffer
       }
    }
 
-   // FLOG_DATA(
-   //    "Tx size: " + std::string(std::to_string(pBuffer->size()).c_str()),
-   //    pBuffer,
-   //    DataType::Tx
-   // );
+   PTRACE_LOG("Tx size: " + std::to_string(pBuffer->size()) + " data: " + Util::bufferToHex(pBuffer));
+   
    uint64_t bytesSent = m_pIo->sendSync(pBuffer);
 
    if(pBuffer->size() != bytesSent)

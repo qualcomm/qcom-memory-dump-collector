@@ -92,10 +92,6 @@ public:
      */
     static const ArgumentDefinition* getArgumentDefinition(const std::string& name);
 
-    /**
-     * @brief Get valid options of an argument
-     */
-    static const std::string getValidOptions(const std::string &argument);
     static void initialize();
 
 private:
