@@ -35,6 +35,11 @@ if (WIN32)
         add_definitions(-DTOOLS_TARGET_WINDOWS -DQFS_IMGMGMT -DTOOLS_ARCH_ARM64
                         -DWIN32 -DNDEBUG -D_LIB -D_UNICODE -DUNICODE -DNOMINMAX)
         set(CMAKE_GENERATOR_PLATFORM "ARM64")
+    elseif(PLATFORM_NAME MATCHES "Win32")
+        message(STATUS "Configuring for Win32 (x86) architecture")
+        add_definitions(-DTOOLS_TARGET_WINDOWS -DQFS_IMGMGMT -DTOOLS_ARCH_32BIT
+                        -DWIN32 -DNDEBUG -D_LIB -D_UNICODE -DUNICODE -DNOMINMAX)
+        set(CMAKE_GENERATOR_PLATFORM "Win32")
     else()
         message(STATUS "Configuring for x64 architecture")
         add_definitions(-DTOOLS_TARGET_WINDOWS -DQFS_IMGMGMT -DTOOLS_ARCH_64BIT
@@ -73,35 +78,7 @@ if(UNIX)
 		message(FATAL_ERROR "libuuid not found. Install with: sudo apt-get install uuid-dev")
 	endif()
 
-	pkg_check_modules(LIBXML2 REQUIRED libxml-2.0)
 elseif(WIN32)
-	# Use locally built libxml2 static library
-	set(LIBXML2_WIN_BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/external/libxml2-win-build")
-
-	# Determine platform (x64 or ARM64)
-	if(PLATFORM_NAME MATCHES "ARM64")
-		set(LIBXML2_LIB_DIR "${LIBXML2_WIN_BUILD_DIR}/build/ARM64")
-	else()
-		set(LIBXML2_LIB_DIR "${LIBXML2_WIN_BUILD_DIR}/build/x64")
-	endif()
-
-	# Set include directories (including iconv dependency)
-	set(LIBXML2_INCLUDE_DIRS
-		"${LIBXML2_WIN_BUILD_DIR}/include"
-		"${CMAKE_CURRENT_SOURCE_DIR}/src/external/libiconv-win-build/include"
-	)
-
-	# Set library files (static linking requires all dependencies)
-	set(LIBXML2_LIBRARIES
-		"${LIBXML2_LIB_DIR}/libxml2-static.lib"
-		"${LIBXML2_LIB_DIR}/libiconv-static.lib"
-		"${LIBXML2_LIB_DIR}/liblzma-static.lib"
-		"${LIBXML2_LIB_DIR}/libz-static.lib"
-	)
-    set(LIBXML2_INCLUDE_DIR "${LIBXML2_INCLUDE_DIRS}")
-    set(LIBXML2_LIBRARY "${LIBXML2_LIBRARIES}")
-
-	# LIBXML_STATIC will be added per-target below
 endif()
 
 # ==============================================================================
@@ -140,17 +117,11 @@ target_include_directories(kLogger INTERFACE
 set(CRASHCOLLECTION_LIB_INCLUDES
 	${QFS_CORE_INCLUDES}
 	${QDS_INCLUDES}
-	${LIBXML2_INCLUDE_DIRS}
 )
 
 # CLI executable includes (minimal restricted access)
 set(CLI_INCLUDES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/cli
-	${CMAKE_CURRENT_SOURCE_DIR}/src
-	${CMAKE_CURRENT_SOURCE_DIR}/src/exception
-	${CMAKE_CURRENT_SOURCE_DIR}/src/device
-	${CMAKE_CURRENT_SOURCE_DIR}/src/exports
-	${LIBXML2_INCLUDE_DIRS}
 )
 
 
@@ -206,7 +177,6 @@ if(WIN32)
 		WIN32_LEAN_AND_MEAN
 		NOMINMAX
 		NOGDI
-		LIBXML_STATIC
 		$<$<CONFIG:Debug>:_DEBUG>
 		$<$<CONFIG:Release>:NDEBUG>
 		_CONSOLE
@@ -227,22 +197,17 @@ if(UNIX)
 		${LIBUSB_LIBRARIES}
 		${UDEV_LIBRARY}
 		${UUID_LIBRARY}
-		${LIBXML2_LIBRARIES}
 		pthread
 		uuid
-		udev		
+		udev
 		kLogger
 	)
 	target_include_directories(CrashCollectionLib PRIVATE ${LIBUSB_INCLUDE_DIRS})
 elseif(WIN32)
 	target_link_libraries(CrashCollectionLib PUBLIC
-		${LIBXML2_LIBRARIES}
 		ws2_32
-		"${LIBXML2_LIB_DIR}/libz-static.lib"
-		"${LIBXML2_LIB_DIR}/liblzma-static.lib"
 		kLogger
 	)
-    # target_link_options(CrashCollectionLib PRIVATE "/LTCG")
 endif()
 
 # ==============================================================================
@@ -271,7 +236,6 @@ if(WIN32)
 		WIN32_LEAN_AND_MEAN
 		NOMINMAX
 		NOGDI
-		LIBXML_STATIC
 		_CRT_SECURE_NO_WARNINGS
 		$<$<CONFIG:Debug>:_DEBUG>
 		$<$<CONFIG:Release>:NDEBUG>
@@ -287,14 +251,8 @@ if(WIN32)
     target_link_libraries(qmdc PUBLIC
         CrashCollectionLib
         QcDevice
-        ${LIBXML2_LIBRARIES}
         Wtsapi32 Userenv Rpcrt4 Setupapi Shlwapi msvcrt ws2_32
         kLogger)
-    # Apply WHOLEARCHIVE flag using target_link_options
-    target_link_options(qmdc PRIVATE
-        "/WHOLEARCHIVE:${LIBXML2_LIB_DIR}/libxml2-static.lib"
-        "/WHOLEARCHIVE:${LIBXML2_LIB_DIR}/libiconv-static.lib"
-    )
 elseif(UNIX)
     # Remove static linking of libstdc++ to avoid heap corruption with dynamic libraries
     # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
@@ -308,7 +266,6 @@ elseif(UNIX)
     target_link_libraries(qmdc PUBLIC
         CrashCollectionLib
         QcDevice
-        ${LIBXML2_LIBRARIES}
         pthread dl uuid udev
         kLogger)
     target_compile_definitions(qmdc PRIVATE TOOLS_TARGET_LINUX)

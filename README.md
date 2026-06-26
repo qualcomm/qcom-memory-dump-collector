@@ -94,8 +94,7 @@ The Qualcomm Memory Dump Collector (QMDC) is a tool for collecting memory dump f
      uuid-dev \
      pkg-config \
      zlib1g-dev \
-     build-essential \
-     libxml2-dev
+     build-essential
    ```
 
 2. Verify installation:
@@ -134,9 +133,7 @@ The Qualcomm Memory Dump Collector (QMDC) is a tool for collecting memory dump f
 │   ├── device/             # Device management
 │   ├── exports/            # Export definitions
 │   ├── external/           # External dependencies
-│   │   ├── kLogger/        # Logging library
-│   │   ├── libiconv-win-build/  # Character encoding conversion library
-│   │   └── libxml2-win-build/   # XML parsing library
+│   │   └── kLogger/        # Logging library
 │   ├── function/           # Function implementations
 │   ├── platform/           # Platform-specific abstractions
 │   ├── protocol/           # Protocol implementations

@@ -46,13 +46,15 @@ namespace CLI {
 
 #define QC_TRY_CLEANUP(crashCollectionPtr)                   \
     do {                                                      \
+        /* Stop monitoring FIRST to ensure thread is stopped */ \
+        /* before destroying handlers it may callback into */   \
+        QC_CMDLINE_IGNORE_EXCEPTION(                          \
+            QC::DeviceDiscovery::stopMonitoring()             \
+        );                                                    \
         QC_CMDLINE_IGNORE_EXCEPTION(                          \
             if (crashCollectionPtr) {                        \
                 (crashCollectionPtr)->destroyService();      \
             }                                                 \
-        );                                                    \
-        QC_CMDLINE_IGNORE_EXCEPTION(                          \
-            QC::DeviceDiscovery::stopMonitoring()             \
         );                                                    \
     } while (0);
 
@@ -131,7 +133,6 @@ int CliCommands::listDevices() {
         std::list<QC::DeviceInfo> devices;
         try {
             devices = QC::DeviceDiscovery::getDeviceList();
-            CFLOG_INFO("Device enumeration completed. Found " + std::to_string(devices.size()) + " device(s).", true);
         } catch (const std::exception& e) {
             CFLOG_ERROR(std::string("Error getting device list: ") + e.what(), true);
             CFLOG_ERROR("Continuing with empty device list", true);
@@ -139,7 +140,22 @@ int CliCommands::listDevices() {
             CFLOG_ERROR("Unknown error getting device list", true);
             CFLOG_ERROR("Continuing with empty device list", true);
         }
-        
+
+        // Remove devices with no protocol available
+        devices.remove_if([](const QC::DeviceInfo& device) {
+            if(device.deviceHandle == 0) {
+                return true;
+            }
+            try {
+                std::list<QC::ProtocolInfo> protocolList = QC::DeviceDiscovery::getProtocolList(device.deviceHandle);
+                return protocolList.empty();
+            } catch (...) {
+                return true;
+            }
+        });
+
+        CFLOG_INFO("Device enumeration completed. Found " + std::to_string(devices.size()) + " device(s).", true);
+
         if (devices.empty()) {
             CFLOG_INFO(
             std::string("No devices found\n"
@@ -150,11 +166,11 @@ int CliCommands::listDevices() {
                         "4. Check if device drivers are installed"),
                 true
             );
-            
+
             QC::DeviceDiscovery::stopMonitoring();
             return 0;
         }
-        
+
         CFLOG_INFO("Available Devices:\n", true);
         
         for (auto& device : devices) {
@@ -439,8 +455,12 @@ int CliCommands::collectMemoryDump(const CliOptions& options) {
 
         // Cleanup
         CFLOG_INFO("Cleaning up...", true);
-        crashCollection->destroyService();
+        // IMPORTANT: Stop monitoring FIRST to ensure the DeviceManagerHelper thread
+        // is fully stopped before destroying service handlers that it may callback into.
+        // Otherwise there's a race condition where the thread tries to signal events
+        // on destroyed objects.
         QC::DeviceDiscovery::stopMonitoring();
+        crashCollection->destroyService();
         return 0;
    } catch (const QC::Common::Exception& e)
    {

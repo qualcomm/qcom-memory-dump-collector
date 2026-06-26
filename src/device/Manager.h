@@ -402,11 +402,9 @@ public:
    size_t getDeviceCount() const;
    DeviceList getDeviceList() const;
    DeviceList getDisconnectedDeviceList() const;
-   void mergeDevice(DeviceHandle srcHandle, DeviceHandle destHandle);
 
    ImplPtr getDeviceByHandle(DeviceHandle handle);
    ImplPtr getDeviceBySerialNumber(const std::string& serialNumberMsm, const std::string& serialNumberAdb);
-   ImplPtr getTcpDeviceByDevicePath(const std::string& devicePath);
    Protocol::BasePtr getProtocolByHandle(Protocol::Handle handle);
    Protocol::BasePtr getProtocolByDescription(const std::string& protocolDescription);
    std::vector<Protocol::BasePtr> getProtocolsByTypes(const std::vector<Device::ProtocolType>& protocolTypes);
@@ -463,11 +461,8 @@ public:
    void removeClientFilePaths(const std::vector<int32_t>& inactiveClientList);
    void removeAllClientFilePaths();
 
-   void mhiForceEdl(int32_t instance, const std::string& programmerPath);
-
    bool isMemoryUsageCritical();
    bool isCpuUsageCritical();
-   void removeDeviceEntry(const DeviceHandle deviceHandle);
    void removeConnectedDevice(const DeviceHandle deviceHandle);
    void addDevice(const ImplPtr& pDevice);
 

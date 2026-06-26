@@ -46,6 +46,8 @@ public:
     bool verbose = false;               // --verbose
     KL::LogOption logOptions = KL::LogOption::None;
 
+    bool portTrace = false; // --verbose
+
     CliOptions():memoryDumpOptions("") {}
 
     ~CliOptions() {}
@@ -58,24 +60,6 @@ public:
         throw std::invalid_argument("Duplicated command type.");
     }
 
-    /**
-     * @brief Prints human readable command
-     * 
-     * @param cmd Current command
-     * @return Human readable command
-     */
-    static std::string getCommandString(const CommandType &cmd)
-    {
-         switch (cmd) {
-            case CommandType::NONE: return "NONE";
-            case CommandType::LIST_DEVICES: return "LIST_DEVICES";
-            case CommandType::COLLECT_MEMORY_DUMP: return "COLLECT_MEMORY_DUMP";
-            case CommandType::DISPLAY_VERSION: return "DISPLAY_VERSION";
-            case CommandType::HELP: return "HELP";
-            default: return std::string("UNKNOWN_COMMAND (") + std::to_string(static_cast<int>(cmd)) + ")";
-        }
-    }
-    
 };
 
 } // namespace CLI

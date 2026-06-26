@@ -126,8 +126,6 @@ public:
    void setSaharaVersion(const uint32_t version);
    uint32_t getSaharaVersion() const;
 
-   void doDisconnect();
-
 protected:
    Sahara(const Communication::CommonIoPtr& pIo, Mode mode);
    virtual void initialize();

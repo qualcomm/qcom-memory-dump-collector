@@ -453,19 +453,19 @@ void Connection::
    if(pResponseData != nullptr)
    {
       notify(std::make_shared<AsyncResponseEvent>((ConnectionPtr)shared_from_this(), transactionId));
-      // FLOG_TRACE(
-      //    "Connection::onReceiveAsync: notify,  transid = " +
-      //    toString(transactionId) + ", bFinalResponse = " +
-      //    toString((uint32_t)bFinalResponse)
-      // );
+      FLOG_DEBUG(
+         "Connection::onReceiveAsync: notify,  transid = " +
+         toString(transactionId) + ", bFinalResponse = " +
+         toString((uint32_t)bFinalResponse)
+      );
    }
    else
    {
-      // FLOG_TRACE(
-      //    "Connection::onReceiveAsync: pResponseData == NULL, transid = " +
-      //    toString(transactionId) + ", bFinalResponse = " +
-      //    toString((uint32_t)bFinalResponse)
-      // );
+      FLOG_DEBUG(
+         "Connection::onReceiveAsync: pResponseData == NULL, transid = " +
+         toString(transactionId) + ", bFinalResponse = " +
+         toString((uint32_t)bFinalResponse)
+      );
    }
 }
 

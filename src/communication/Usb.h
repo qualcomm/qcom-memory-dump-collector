@@ -58,7 +58,6 @@ private:
    typedef int64_t Handle;
    static const Handle INVALID_HANDLE;
 
-   friend class UsbEnabler;
    friend class RxWorker;
 
    std::string m_description;  ///< for UI display

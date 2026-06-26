@@ -42,13 +42,6 @@ public:
 
    virtual ~DataPacket();
 
-   virtual Device::SharedByteBufferPtr getPayload() const;
-   virtual size_t getPayloadSize() const;
-   virtual std::chrono::system_clock::time_point getReceiveTime() const;
-   virtual Device::DataPacket::Direction getDirection() const;
-   virtual size_t getTimeSortedIndex() const;
-
-
    virtual uint64_t getId() const
    {
       return m_id;
