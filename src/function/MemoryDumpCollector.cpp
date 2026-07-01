@@ -958,7 +958,7 @@ void MemoryDumpCollector::downloadPartitions(
    }
 
    // Download the partitions
-   m_pDumpInfo->ReportV("QUTS %s", version.str().c_str());
+   m_pDumpInfo->ReportV("QMDC %s", version.str().c_str());
    m_pDumpInfo->ReportV("pref               base     length               "
                         "region            file name");
    m_pDumpInfo->ReportV("------------------------------------------------------"

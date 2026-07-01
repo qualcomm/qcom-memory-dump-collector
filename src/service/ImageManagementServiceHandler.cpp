@@ -495,7 +495,6 @@ void ImageManagementServiceHandler::onMemoryDumpCollectorEvent(Function::MemoryD
 {
    sendEvent(pEvent->getEventId(), pEvent->getDescription());
 
-   // send event to all QUTS clients
    Device::Manager::getInstance()->sendImageManagementServiceEvent(
       QC::getName(),
       m_pDevice->getHandle(),
