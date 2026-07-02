@@ -55,7 +55,7 @@ The following commands can be used to set a device to crash mode:
 
 If the device is in Crash mode, the output will include a line similar to:
 
-`Protocol Type: SAHARA --- /dev/QCOM_LIBUSB_Diagnistics_90DB_2-7:1.0`
+`Protocol Type: SAHARA --- /dev/QCOM_LIBUSB_Diagnostics_90DB_2-7:1.0`
 
 (See the screenshot below for an example.)<br>
 
