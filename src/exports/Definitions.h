@@ -137,7 +137,6 @@ struct ProtocolInfo
    uint32_t localPort;
    uint32_t remotePort;
    std::string alternateDescription;
-   DeviceMode deviceMode;  // For Sahara protocols, indicates crash/download/efs mode
 };
 
 struct DeviceInfo

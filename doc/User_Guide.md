@@ -55,7 +55,7 @@ The following commands can be used to set a device to crash mode:
 
 If the device is in Crash mode, the output will include a line similar to:
 
-`Protocol Type: SAHARA --- /dev/QCOM_LIBUSB_Diagnostics_90DB_2-7:1.0`
+`Protocol Type: SAHARA --- /dev/QCOM_LIBUSB_Diagnistics_90DB_2-7:1.0`
 
 (See the screenshot below for an example.)<br>
 
@@ -78,7 +78,7 @@ Figure 2 - Successfully set device to Crash mode (Windows)
 
 If the device is in Crash mode, the output will include a line similar to:
 
-`Protocol Type: SAHARA --- /dev/QCOM_LIBUSB_Diagnostics_90DB_2-7:1.0`
+`Protocol Type: SAHARA --- /dev/QCOM_LIBUSB_Diagnistics_90DB_2-7:1.0`
 
 
 (See the screenshot below for an example.)<br>
@@ -157,14 +157,6 @@ Port Trace logs can be found in the following location:
 2. **Single Device at a Time**
 
    QMDC supports collecting memory dumps from only one device at a time. Multi-device parallel operations are not supported.
-
-3. **ADB conflict (userspace driver only):** 
-   The userspace driver has a known compatibility issue with ADB. If you are using the userspace driver, kill
-   the ADB server before running the tool:
-   ```bash
-   adb kill-server
-   ```
-  If you need ADB running concurrently with crash collection, use the kernel driver instead
 
 ## FAQ
 

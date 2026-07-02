@@ -152,28 +152,6 @@ int CliCommands::listDevices() {
             }
         });
 
-        // Keep only devices in crash mode (Sahara MODE_MEMORY_DEBUG), exclude EDL devices
-        const std::regex edlPattern(".*?EDL|QDLoader.*?", std::regex::icase);
-        devices.remove_if([&edlPattern](const QC::DeviceInfo& device) {
-            try {
-                std::list<QC::ProtocolInfo> protocolList = QC::DeviceDiscovery::getProtocolList(device.deviceHandle);
-                for (const auto& protocol : protocolList) {
-                    // Remove EDL devices
-                    if (protocol.protocolType == QC::ProtocolType::PROT_SAHARA &&
-                        std::regex_match(protocol.description, edlPattern)) {
-                        return true; // Remove this device
-                    }
-                    if (protocol.protocolType == QC::ProtocolType::PROT_SAHARA &&
-                        protocol.deviceMode == QC::DeviceMode::DEVICE_MODE_SAHARA_CRASH) {
-                        return false; // Keep this device
-                    }
-                }
-            } catch (...) {
-                // If we can't get protocols, filter it out
-            }
-            return true; // Remove this device
-        });
-
         CFLOG_INFO("Device enumeration completed. Found " + std::to_string(devices.size()) + " device(s).", true);
 
         if (devices.empty()) {

@@ -1,12 +1,5 @@
 # QMDC Release Notes
 
-## v1.2.2
-
-### Bug Fixes
-- Filter out devices that aren't in true crash mode from device list
-
----
-
 ## v1.2.1
 
 > **Note:** Since this version, CLI only works with user space driver 1.0.2.2 (Windows) or 1.0.1.8 (Linux).
