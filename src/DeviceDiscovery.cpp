@@ -9,6 +9,7 @@
 #include "device/Impl.h"
 #include "device/Manager.h"
 #include "Globals.h"
+#include "protocol/Sahara.h"
 #include "tracker/FunctionTracker.h"
 #include "util/SystemHelper.h"
 
@@ -32,6 +33,17 @@ ProtocolInfo getProtocolInfo(Device::Protocol::Handle protocolHandle)
 
    info.protocolType =
       static_cast<QC::ProtocolType>(Device::Manager::getInstance()->getProtocolType(pProtocol->getHandle()));
+
+   // Get device mode for Sahara protocols
+   info.deviceMode = QC::DeviceMode::DEVICE_MODE_NONE;
+   if(info.protocolType == QC::ProtocolType::PROT_SAHARA)
+   {
+      Device::Protocol::SaharaPtr pSahara = pProtocol.dynamicCast<Device::Protocol::Sahara>();
+      if(pSahara)
+      {
+         info.deviceMode = static_cast<QC::DeviceMode>(pSahara->toDeviceMode(pSahara->getMode()));
+      }
+   }
 
    return info;
 }
