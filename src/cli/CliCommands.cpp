@@ -46,15 +46,13 @@ namespace CLI {
 
 #define QC_TRY_CLEANUP(crashCollectionPtr)                   \
     do {                                                      \
-        /* Stop monitoring FIRST to ensure thread is stopped */ \
-        /* before destroying handlers it may callback into */   \
-        QC_CMDLINE_IGNORE_EXCEPTION(                          \
-            QC::DeviceDiscovery::stopMonitoring()             \
-        );                                                    \
         QC_CMDLINE_IGNORE_EXCEPTION(                          \
             if (crashCollectionPtr) {                        \
                 (crashCollectionPtr)->destroyService();      \
             }                                                 \
+        );                                                    \
+        QC_CMDLINE_IGNORE_EXCEPTION(                          \
+            QC::DeviceDiscovery::stopMonitoring()             \
         );                                                    \
     } while (0);
 
@@ -477,12 +475,8 @@ int CliCommands::collectMemoryDump(const CliOptions& options) {
 
         // Cleanup
         CFLOG_INFO("Cleaning up...", true);
-        // IMPORTANT: Stop monitoring FIRST to ensure the DeviceManagerHelper thread
-        // is fully stopped before destroying service handlers that it may callback into.
-        // Otherwise there's a race condition where the thread tries to signal events
-        // on destroyed objects.
-        QC::DeviceDiscovery::stopMonitoring();
         crashCollection->destroyService();
+        QC::DeviceDiscovery::stopMonitoring();
         return 0;
    } catch (const QC::Common::Exception& e)
    {
