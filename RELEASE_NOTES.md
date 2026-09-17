@@ -1,5 +1,5 @@
 # QMDC Release Notes
-## v1.2.3
+## v1.2.4
 ### Features
 - Device parameter is now optional. Crash collection automatically detects and collects from a single crashed device.
 - crash-collection arg is now optional. QMDC runs crash collection by default when no command arguments are provided.
