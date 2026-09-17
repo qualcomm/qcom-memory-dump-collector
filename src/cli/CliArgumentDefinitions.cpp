@@ -59,6 +59,21 @@ const ArgumentDefinition* CliArgumentDefinitions::getArgumentDefinition(const st
     return (it != argumentDefinitions.end()) ? &it->second : nullptr;
 }
 
+const CommandDefinition* CliArgumentDefinitions::getCommandDefinition(const std::string& name)
+  {
+      if (!initialized) {
+          initialize();
+      }
+
+      for (const auto& command : commandDefinitions) {
+          if (command.name == name) {
+              return &command;
+          }
+      }
+
+      return nullptr;
+  }
+
 void CliArgumentDefinitions::initialize() {
     if (initialized) return;
     // Sort options alphabetically in word
