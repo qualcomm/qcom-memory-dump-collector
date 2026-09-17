@@ -359,7 +359,20 @@ QC::DeviceInfo CliCommands::findTargetDevice(const std::string &deviceIdentifier
         bool foundInThisScan = false;
         for(const auto& device: devices)
         {
-            if(matchesIdentifier(device))
+            if (deviceIdentifier == "")
+            {
+                if(devices.size() == 1)
+                {
+                    targetDevice = device;
+                    CFLOG_INFO("Target device found: " + device.description, false);
+                    deviceFound = true;
+                    foundInThisScan = true;
+                }
+                    else if (devices.size() > 1) {
+                    QC_THROW_DEVICE_ERROR(QC::Common::Exception::DEVICE_MULTIPLE_CRASHED_DEVICES, deviceIdentifier, "device discovery");
+                }
+            }
+            else if(matchesIdentifier(device))
             {
                 targetDevice = device;
                 foundInThisScan = true;
