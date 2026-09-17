@@ -108,12 +108,12 @@ CliOptions CliParser::parse(int argc, char* argv[])
     
     if (commandsFound.size() <= 0)
     {
-        CFLOG_ERROR(
-         "Unable to determine command. Use -h or --help for usage "
-         "information.",
-         false
-        );
-        QC_THROW_CMDLINE_ERROR(QC::Common::Exception::MISSING_REQUIRED_PARAMETER, "command", "Unable to determine command");
+        const auto* crashCollection =
+          CliArgumentDefinitions::getCommandDefinition("crash-collection");
+
+        if (crashCollection != nullptr) {
+            commandsFound.push_back(*crashCollection);
+        }
     }
     else if (commandsFound.size() > 1)
     {

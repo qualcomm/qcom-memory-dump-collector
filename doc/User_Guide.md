@@ -105,7 +105,7 @@ To view a list of all available commands, run ./qmdc --help or  ./qmdc -h from t
 
 <table>
 <tr><th>Command</th><th>Required Arguments</th><th>Optional Arguments</th><th>Description</th></tr>
-<tr><td><code>--crash-collection</code></td><td style="white-space: nowrap;"><code>--device</code><br><code>--path-name</code></td><td style="white-space: nowrap;"><code>--verbose</code></td><td>Download memory dumps from a device.</td></tr>
+<tr><td><code>--crash-collection</code></td><td style="white-space: nowrap;"><code>--path-name</code></td><td style="white-space: nowrap;"><code>--device</code><br><code>--verbose</code></td><td>Download memory dumps from a device.</td></tr>
 <tr><td><code>--help</code>, <code>-h</code></td><td style="white-space: nowrap;"></td><td style="white-space: nowrap;"></td><td>Display help information.</td></tr>
 <tr><td><code>--devices</code></td><td style="white-space: nowrap;"></td><td style="white-space: nowrap;"><code>--verbose</code></td><td>List all available device identifiers.</td></tr>
 <tr><td><code>--version</code></td><td style="white-space: nowrap;"></td><td style="white-space: nowrap;"></td><td>Display QMDC application version.</td></tr>

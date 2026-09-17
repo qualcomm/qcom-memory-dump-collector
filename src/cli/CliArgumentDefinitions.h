@@ -92,6 +92,11 @@ public:
      */
     static const ArgumentDefinition* getArgumentDefinition(const std::string& name);
 
+    /**
+     * @brief Get command definition by name
+     */
+    static const CommandDefinition* getCommandDefinition(const std::string& name);
+    
     static void initialize();
 
 private:

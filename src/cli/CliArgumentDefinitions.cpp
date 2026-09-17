@@ -59,6 +59,21 @@ const ArgumentDefinition* CliArgumentDefinitions::getArgumentDefinition(const st
     return (it != argumentDefinitions.end()) ? &it->second : nullptr;
 }
 
+const CommandDefinition* CliArgumentDefinitions::getCommandDefinition(const std::string& name)
+  {
+      if (!initialized) {
+          initialize();
+      }
+
+      for (const auto& command : commandDefinitions) {
+          if (command.name == name) {
+              return &command;
+          }
+      }
+
+      return nullptr;
+  }
+
 void CliArgumentDefinitions::initialize() {
     if (initialized) return;
     // Sort options alphabetically in word
@@ -71,7 +86,7 @@ void CliArgumentDefinitions::initialize() {
         ArgumentCategory::DEVICE_OPTIONS,
         "",
         {},
-        true,
+        false,
         "12345",
         "Use SERIAL NUMBER or DEVICE DESCRIPTION from --devices command",
         [](QC::CLI::CliOptions& options, const std::string& value) {
@@ -163,10 +178,10 @@ void CliArgumentDefinitions::initialize() {
             "crash-collection",
             "collect memory dump",
             {
-                argumentDefinitions["device"],
                 argumentDefinitions["path-name"],
             },
             {
+                argumentDefinitions["device"],
                 argumentDefinitions["verbose"],
                 argumentDefinitions["port-trace"]
             },
