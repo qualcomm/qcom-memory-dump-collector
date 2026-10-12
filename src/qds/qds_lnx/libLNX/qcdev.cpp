@@ -136,18 +136,20 @@ static void fetchIPAddr(char *ipAddr)
         return;
     }
 
-    while (fread(&c, sizeof(c), 1, fpipe) && id < QCDEV_MAX_VALUE_NAME)
+    while (fread(&c, sizeof(c), 1, fpipe) && id < QCDEV_MAX_VALUE_NAME - 1)
     {
 		if (c != '\n') {
 			ip_addr[id++] = c;
             		if (id-1 == 12)
                 		ip_addr[id-1] = (((c - '0') + 1) + '0');
 		} else {
-			ip_addr[id++] = '\0';
+			break;
 		}
     }
+    ip_addr[id] = '\0';
 
-   strncpy(ipAddr, ip_addr, strlen(ip_addr)+1);
+    strncpy(ipAddr, ip_addr, QCDEV_MAX_VALUE_NAME - 1);
+    ipAddr[QCDEV_MAX_VALUE_NAME - 1] = '\0';
 
     pclose(fpipe);
 }
@@ -362,10 +364,7 @@ static void *getName(const void *devName, const char *serialNum)
             /* Extract based on <SER_NUM>**ttyUSB0 */
             if (strcasestr(dirent_p->d_name, (const char *)(devName)))
             {
-                strncpy(path, DevNode, strlen(DevNode));
-                path[QCDEV_PORT_NAME_LEN - 1] = '\0';
-                strncpy(path + strlen(path), dirent_p->d_name, QCDEV_PORT_NAME_LEN - strlen(path) - 1);
-                path[QCDEV_PORT_NAME_LEN - 1] = '\0';
+                snprintf(path, QCDEV_PORT_NAME_LEN, "%s%s", DevNode, dirent_p->d_name);
                 break;
             }
         }
@@ -972,8 +971,8 @@ static void processAddDevice(struct udev_device *dev)
             value += strlen(QCDEV_QMI_NAME);
             pdeviceCtx->mDevParams.IfNameBufLen = 0;
 
-            if (snprintf(pdeviceCtx->mDevParams.IfName, QCDEV_PORT_NAME_LEN - 1,
-                         "%s%d", value) > 0)
+            if (snprintf(pdeviceCtx->mDevParams.IfName, QCDEV_PORT_NAME_LEN,
+                         "usb%s", value) > 0)
             {
                 pdeviceCtx->mDevParams.IfNameBufLen =
                     strlen(pdeviceCtx->mDevParams.IfName);
@@ -1267,7 +1266,7 @@ static void processAddDevice(struct udev_device *dev)
 					}
 				}
 
-				if(pdeviceCtx->mDevParams.Protocol == 0x0 && pdeviceCtx->mDevParams.DevDesc !=NULL){
+				if(pdeviceCtx->mDevParams.Protocol == 0x0){
 					char* composite_name = (char*)malloc(QCDEV_MAX_VALUE_NAME);
 					if (strncpy(composite_name ,(PCHAR)pdeviceCtx->mDevParams.DevDesc, QCDEV_MAX_VALUE_NAME - 1) != NULL)
 					{
@@ -1275,14 +1274,18 @@ static void processAddDevice(struct udev_device *dev)
 						snprintf(pdeviceCtx->mDevParams.DevDesc,QCDEV_MAX_VALUE_NAME,
 								  "Qualcomm USB Composite Device:%s",composite_name);
 					}
-					if(pdeviceCtx->mDevParams.SerNum){
-						snprintf(strlen(pdeviceCtx->mDevParams.DevDesc)+pdeviceCtx->mDevParams.DevDesc,
-						QCDEV_MAX_VALUE_NAME,":%s",pdeviceCtx->mDevParams.SerNum);
+					if(pdeviceCtx->mDevParams.SerNum[0]){
+						size_t devDescLen = strlen(pdeviceCtx->mDevParams.DevDesc);
+						snprintf(pdeviceCtx->mDevParams.DevDesc + devDescLen,
+								 QCDEV_MAX_VALUE_NAME - devDescLen, ":%s", pdeviceCtx->mDevParams.SerNum);
 					}
-					if(pdeviceCtx->mDevParams.Loc){
-						snprintf(strlen(pdeviceCtx->mDevParams.DevDesc)+pdeviceCtx->mDevParams.DevDesc,
-						QCDEV_MAX_VALUE_NAME,":%s",pdeviceCtx->mDevParams.Loc+strlen(BUS_LOC));
+					if(pdeviceCtx->mDevParams.Loc[0]){
+						size_t devDescLen = strlen(pdeviceCtx->mDevParams.DevDesc);
+						snprintf(pdeviceCtx->mDevParams.DevDesc + devDescLen,
+								 QCDEV_MAX_VALUE_NAME - devDescLen, ":%s",
+								 pdeviceCtx->mDevParams.Loc + strlen(BUS_LOC));
 					}
+					pdeviceCtx->mDevParams.DevDescBufLen = strlen(pdeviceCtx->mDevParams.DevDesc);
 					if (strncpy(pdeviceCtx->mDevParams.ParentDev,pdeviceCtx->mDevParams.DevDesc, QCDEV_MAX_VALUE_NAME - 1) != NULL)
 					{
 						pdeviceCtx->mDevParams.ParentDev[QCDEV_MAX_VALUE_NAME - 1] = '\0';
@@ -1354,7 +1357,7 @@ static void processAddDevice(struct udev_device *dev)
     devPP = udev_device_get_parent(devP);
     const char *parentName;
     parentName = udev_device_get_sysattr_value(devPP, "product");
-    if (parentName != NULL && (!strcasestr(parentName, "Controller")) && snprintf(pdeviceCtx->mDevParams.ParentDev, QCDEV_MAX_VALUE_NAME, "Qualcomm USB Composite Device:%s", parentName) != NULL)
+    if (parentName != NULL && (!strcasestr(parentName, "Controller")) && snprintf(pdeviceCtx->mDevParams.ParentDev, QCDEV_MAX_VALUE_NAME, "Qualcomm USB Composite Device:%s", parentName) > 0)
     {
         pdeviceCtx->mDevParams.ParentDev[QCDEV_MAX_VALUE_NAME - 1] = '\0';
         pdeviceCtx->mDevParams.ParentDevBufLen = strlen(pdeviceCtx->mDevParams.ParentDev);
@@ -1369,7 +1372,7 @@ static void processAddDevice(struct udev_device *dev)
         if (parentName != NULL &&
             (!strcasestr(parentName, "Controller")) &&
             snprintf(pdeviceCtx->mDevParams.ParentDev, QCDEV_MAX_VALUE_NAME,
-                     "Qualcomm USB Composite Device:%s", parentName) != NULL)
+                     "Qualcomm USB Composite Device:%s", parentName) > 0)
         {
             pdeviceCtx->mDevParams.ParentDev[QCDEV_MAX_VALUE_NAME - 1] = '\0';
             pdeviceCtx->mDevParams.ParentDevBufLen = strlen(pdeviceCtx->mDevParams.ParentDev);
