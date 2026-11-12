@@ -2250,8 +2250,9 @@ void Manager::setApplicationInfo(
 
     //This will only allow Qualcomm Device VID_05C6 (any PID including 90DB crash mode)
     mySetting.Version = 1;
-    mySetting.Settings = DEV_FEATURE_SCAN_USB_WITH_VID;
-    mySetting.DeviceClass = 0x0F;
+    mySetting.Settings = DEV_FEATURE_INCLUDE_NONE_QC_PORTS | DEV_FEATURE_SCAN_USB_WITH_VID;
+    mySetting.DeviceClass = DEV_CLASS_SAHARA | DEV_CLASS_PORTS;
+    mySetting.DeviceProtocol = DEV_PROTOCOL_MASK_SAHARA | DEV_PROTOCOL_MASK_RAMDUMP;
     mySetting.VID = (PTSTR)TEXT("VID_05C6");
 
     // Set logging callback BEFORE calling SetFeature to avoid cout

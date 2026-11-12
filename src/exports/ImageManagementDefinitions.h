@@ -60,7 +60,7 @@ typedef struct _MemoryDumpOptions__isset
 // Structs and classes with C++ objects (std::string, std::vector, std::map)
 // must use default alignment
 
-class StorageOptions
+class QMDC_API StorageOptions
 {
 public:
    StorageOptions(StorageCollatedType::type collatedType);
@@ -76,7 +76,7 @@ private:
    StorageOptions();
 };
 
-class MemoryDumpOptions
+class QMDC_API MemoryDumpOptions
 {
 public:
    MemoryDumpOptions(std::string pathName);
