@@ -1,8 +1,6 @@
 // Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
 // SPDX-License-Identifier: BSD 3-Clause Clear License
 #pragma once
-#include "qmdc_export.h"
-
 #include <cstdint>
 #include <list>
 #include <string>

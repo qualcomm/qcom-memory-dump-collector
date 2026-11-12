@@ -48,7 +48,7 @@ VOID Utils::QCD_Printf(QLogLevel Level, const PCHAR Format, ...)
 #ifdef TOOLS_TARGET_WINDOWS
       OutputDebugStringA((PCHAR)msgBuffer);
 #else
-      fprintf(stderr, "%s", msgBuffer);
+      cout << msgBuffer << std::endl;
 #endif
    }
 }  // QCD_Printf

@@ -18,7 +18,6 @@
 #include <sys/socket.h>
 #include <unordered_map>
 #include <string>
-#include <memory>
 
 #else
 #include <windows.h>
@@ -88,8 +87,6 @@
 #define QC_DEV_TYPE_TAC    0x08             /**< For TAC devices     */
 #define QC_DEV_TYPE_EPM    0x09             /**< For EPM devices     */
 //#define QC_DEV_TYPE_LIBUSB 0x0A             /**< For LIBUSB based devices  */
-#define QC_DEV_TYPE_EUD    0x0B             /**< For EUD (Embedded USB Debug) devices */
-#define QC_DEV_TYPE_SAHARA 0x0C             /**< For Sahara/EDL devices              */
 
 /* State of the device */
 #define QC_DEV_STATE_DEPARTURE 0x00         /**< Device removed/exited  */
@@ -114,12 +111,11 @@
 #define DEV_FEATURE_SCAN_USB_WITH_VID     0x00010000 /**< Scan with VID given */
 
 /* To select the Mask for device discovery */
-#define DEV_CLASS_NET    0x00000001         /**< To select Network class    */
-#define DEV_CLASS_PORTS  0x00000002         /**< To select ports class      */
-#define DEV_CLASS_USB    0x00000004         /**< To select gen-usb class    */
-#define DEV_CLASS_MDM    0x00000008         /**< To select modem class      */
-#define DEV_CLASS_ADB    0x00000010         /**< To select ADB Class        */
-#define DEV_CLASS_SAHARA 0x00000020         /**< To select Sahara/EDL class */
+#define DEV_CLASS_NET   0x00000001          /**< To select Network class*/
+#define DEV_CLASS_PORTS 0x00000002          /**< To select ports class  */
+#define DEV_CLASS_USB   0x00000004          /**< To select gen-usb class*/
+#define DEV_CLASS_MDM   0x00000008          /**< To select modem class  */
+#define DEV_CLASS_ADB   0x00000010          /**< To select ADB Class    */
 
 /* USB Protocol Number Assignment */
 #define DEV_PROTOCOL_UNKNOWN   0x00         /**< Unknown protocol   */
@@ -138,22 +134,8 @@
 #define DEV_PROTOCOL_RESERVED  0xFF         /**< Reserved protocol  */
 #define DEV_PROTOCOL_MAJOR_REVISION_MASK           0xF0
 
-/**
- * Bitmask flags for DEV_FEATURE_SETTING.DeviceProtocol.
- * OR these together to select which sub-protocols within DEV_CLASS_SAHARA
- * should be reported.  DeviceProtocol = 0 means accept all protocols that
- * belong to the subscribed DeviceClass (no narrowing).
- */
-#define DEV_PROTOCOL_MASK_SAHARA         0x00000001 /**< DEV_PROTOCOL_SAHARA (0x10)                      */
-#define DEV_PROTOCOL_MASK_EDL            0x00000002 /**< DEV_PROTOCOL_SAHARA_PBL_EMERGENCY_DOWNLOAD (0x11)*/
-#define DEV_PROTOCOL_MASK_FLASHLESS_BOOT 0x00000004 /**< DEV_PROTOCOL_SAHARA_PBL_FLASHLESS_BOOT (0x12)   */
-#define DEV_PROTOCOL_MASK_RAMDUMP        0x00000008 /**< DEV_PROTOCOL_SAHARA_SBL_XBL_RAMDUMP (0x13)      */
-#define DEV_PROTOCOL_MASK_EFS            0x00000010 /**< DEV_PROTOCOL_SAHARA_TN_APPS_Remote_EFS (0x14)   */
-#define DEV_PROTOCOL_MASK_FIREHOSE       0x00000020 /**< DEV_PROTOCOL_FIREHOSE (0x20)                    */
-
 #define DevNode "/dev/"
 
-using DevDetailsMap =  std::unordered_map<std::string, std::string>;
 struct device_info;
 
 /* Align structures to 8 bytes packing. */
@@ -166,14 +148,10 @@ struct device_info;
  */
 typedef struct _DEV_FEATURE_SETTING
 {
-    ULONG Version;          /**< 1                                                        */
-    ULONG Settings;         /**< OR'ed feature masks                                      */
-    ULONG DeviceClass;      /**< 0 - all classes; OR'ed DEV_CLASS_* bits                  */
-    ULONG DeviceProtocol;   /**< 0 - all protocols in class; specific DEV_PROTOCOL_* value
-                                 to narrow within a class (e.g. DEV_PROTOCOL_SAHARA_PBL_EMERGENCY_DOWNLOAD) */
-    PTSTR VID;              /**< Points to external string data; NOT owned by this struct */
-
-    _DEV_FEATURE_SETTING() : Version(0), Settings(0), DeviceClass(0), DeviceProtocol(0), VID(nullptr) {}
+    ULONG Version;       /**< 1                      */
+    ULONG Settings;      /**< OR'ed feature masks    */
+    ULONG DeviceClass;   /**< 0 - all classes        */
+    PTSTR VID;
 } DEV_FEATURE_SETTING, *PDEV_FEATURE_SETTING;
 
 /**
@@ -199,7 +177,7 @@ typedef struct _CB_PARAMS
     PCHAR HwId;     /**< device hardware ID                            */
     PCHAR ParentDev;/**< name of parent device if present              */
     PCHAR ParentLocationInfomation;/**< physical location of parent device if present */
-    std::unique_ptr<DevDetailsMap> DevDetails; /* Using unique ptr to avoid calling the destructor */
+    std::unordered_map<std::string, std::string>* DevDetails; // pointer-based: contains fields obtained from parsed device description string
 } CB_PARAMS, *PCB_PARAMS;
 
 /**
@@ -277,7 +255,7 @@ typedef struct _DEV_PARAMS_N
 
     CHAR  ParentLocationInfomation[QCDEV_MAX_VALUE_NAME];
     ULONG  ParentLocationInfomationBufLen;
-    std::unique_ptr<DevDetailsMap> DevDetails; /* Unique ptr to call the destructor implictly */
+    std::unordered_map<std::string, std::string>* DevDetails; // pointer-based: contains fields obtained from parsed device description string
 } DEV_PARAMS_N, *PDEV_PARAMS_N;
 
 /**
@@ -290,29 +268,9 @@ typedef struct _DeviceCtx{
     CHAR        mDevNode[QCDEV_MAX_VALUE_NAME];
     CHAR        mSubsystem[QCDEV_MAX_VALUE_NAME];
     ULONG       mProductNameLen;        /**< Device name len in bytes       */
-    PVOID       mContextInt;            /**< Integer device index cast to PVOID; NOT a heap pointer */
-    PVOID       mpUserContext;          /**< External application context; NOT owned here */
+    PVOID       mContextInt;            /**< Device context modified in app */
+    PVOID       mpUserContext;
     struct  _DeviceCtx *mNext;          /**< Pointer to next dev info       */
-
-    /** Constructor: value-initialises all members.
-     *  unique members (DevDetails) are default-constructed to nullptr;
-     *  POD members (char arrays, integers) are zero-initialised via aggregate {}. */
-    _DeviceCtx()
-        : mDevParams{}, mCbParams{}, mProductNameLen(0), mContextInt(nullptr), mpUserContext(nullptr), mNext(nullptr)
-    {
-        memset(mProductName, 0, sizeof(mProductName));
-        memset(mDevNode,     0, sizeof(mDevNode));
-        memset(mSubsystem,   0, sizeof(mSubsystem));
-    }
-
-    /**
-     * Destructor: mDevParams.DevDetails and mCbParams.DevDetails are unique_ptr
-     * members – they are automatically released when the owner goes out of
-     * scope; no manual delete is needed.
-     * mContextInt is an integer device-index cast to PVOID – do NOT delete.
-     * mpUserContext is an external application pointer   – do NOT delete.
-     */
-    ~_DeviceCtx() = default;
 }DeviceCtx, *PDeviceCtx;
 
 /**
@@ -455,27 +413,6 @@ namespace QcDevice
      * @returns Nothing
      */
     QCDEVLIB_API VOID StopDeviceMonitor(VOID);
-
-    /**
-     * @brief   Initialize EUD trace peripheral.
-     *          Must be called after opening the EUD Control device.
-     * @returns TRUE on success, FALSE on failure.
-     */
-    QCDEVLIB_API BOOL initializeEudTrace(VOID);
-
-    /**
-     * @brief   Enter ambient mode (spoof USB detach on EUD device)
-     *
-     * @returns BOOL  0 on success
-     */
-    QCDEVLIB_API BOOL startAmbientMode(VOID);
-
-    /**
-     * @brief   Exit ambient mode (spoof USB attach on EUD device)
-     *
-     * @returns BOOL  0 on success
-     */
-    QCDEVLIB_API BOOL stopAmbientMode(VOID);
 
     /**
      * @brief   To get the device list

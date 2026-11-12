@@ -397,7 +397,7 @@ QCDEVLIB_API BOOL WINAPI QdIoQmi::QCWWAN_GetQmiServiceVersionEx
    PCHAR p;
    PCHAR ioBuffer;
 
-   ioBuffer = new(std::nothrow) CHAR[sizeof(QMI_SERVICE_VERSION) + 256];
+   ioBuffer = (PCHAR)malloc(sizeof(QMI_SERVICE_VERSION)+256);
    if (ioBuffer == NULL)
    {
       return FALSE;
@@ -428,12 +428,12 @@ QCDEVLIB_API BOOL WINAPI QdIoQmi::QCWWAN_GetQmiServiceVersionEx
          // strcpy(AddendumVersionLabel, p);
          strncpy_s(AddendumVersionLabel, sizeof(QMI_SERVICE_VERSION)+256, p, _TRUNCATE);
       }
-      delete[] ioBuffer;
+      free(ioBuffer);
 
       return TRUE;
    }
 
-   delete[] ioBuffer;
+   free(ioBuffer);
    return FALSE;
 }  // QCWWAN_GetQmiServiceVersionEx
 

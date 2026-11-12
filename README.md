@@ -74,11 +74,11 @@ The Qualcomm Memory Dump Collector (QMDC) is a tool for collecting memory dump f
 
 #### Windows (x64)
 
-`build/Windows/x64/bin/Release/`
+`build/Windows/x64/Release/bin/`
 
 #### Windows (ARM64)
 
-`build/Windows/ARM64/bin/Release/`
+`build/Windows/ARM64/Release/bin/`
 
 
 ## Build Instructions for Linux
@@ -120,7 +120,7 @@ The Qualcomm Memory Dump Collector (QMDC) is a tool for collecting memory dump f
    ```
 ### Build Output 
 
-`build/Linux/x86_64/bin/`
+`build/Linux/x86_64/Release/bin/`
 
 ## Project Structure
 ```
