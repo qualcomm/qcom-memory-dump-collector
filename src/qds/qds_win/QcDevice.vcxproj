@@ -29,6 +29,14 @@
   <ItemGroup>
     <ClCompile Include="..\common\qdver.cpp" />
     <ClCompile Include="..\common\utils.cpp" />
+    <ClCompile Include="..\EUD\QdsEud.cpp">
+      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">false</ConformanceMode>
+      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ConformanceMode>
+      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ConformanceMode>
+      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ConformanceMode>
+      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">false</ConformanceMode>
+      <ConformanceMode Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ConformanceMode>
+    </ClCompile>
     <ClCompile Include="..\libusb\source\libusb-dynamic-loader.cpp" />
     <ClCompile Include="..\libusb\source\qcom-libusb.cpp" />
     <ClCompile Include="QdIoQmi.cpp" />
@@ -37,6 +45,7 @@
   <ItemGroup>
     <ClInclude Include="..\common\qdver.h" />
     <ClInclude Include="..\common\utils.h" />
+    <ClInclude Include="..\EUD\QdsEud.h" />
     <ClInclude Include="..\libusb\source\libusb-dynamic-loader.h" />
     <ClInclude Include="..\libusb\source\qcom-libusb.h" />
     <ClInclude Include="QdIoQmi.h" />
@@ -94,35 +103,27 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="StaticLib.props" />
-    <Import Project="PropertySheet_microsoft_sdk.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="StaticLib.props" />
-    <Import Project="PropertySheet_microsoft_sdk.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="StaticLib.props" />
-    <Import Project="PropertySheet_microsoft_sdk.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="StaticLib.props" />
-    <Import Project="PropertySheet_microsoft_sdk.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="StaticLib.props" />
-    <Import Project="PropertySheet_microsoft_sdk.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="StaticLib.props" />
-    <Import Project="PropertySheet_microsoft_sdk.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <OutDir>$(SolutionDir)Builds\$(Platform)\$(Configuration)\lib\</OutDir>
+    <IntDir>$(SolutionDir)Builds\$(Platform)\$(Configuration)\obj\$(ProjectName)\</IntDir>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>..\..\inc;.\;..\..\src;$(IncludePath)</IncludePath>
   </PropertyGroup>

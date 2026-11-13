@@ -13,7 +13,7 @@ namespace QC {
 #elif defined TOOLS_TARGET_LINUX
 
 #endif
-   class CrashCollection {
+   class QMDC_API CrashCollection {
    public:
       CrashCollection(DeviceInfo deviceInfo);
       virtual ~CrashCollection();

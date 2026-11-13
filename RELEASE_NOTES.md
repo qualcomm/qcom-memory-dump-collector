@@ -1,4 +1,25 @@
 # QMDC Release Notes
+
+## v1.3.1
+
+### Features
+
+- Add C-compatible device monitoring, discovery, and crash collection APIs for Rust and other C ABI consumers through `qmdc_crash_collection.h`.
+- Add shared SDK library builds alongside the existing statically linked CLI, with the C and C++ APIs available in the same library.
+
+### Bug Fixes
+
+- Fix buffer overflows and out-of-bounds device-location reads in Linux device enumeration.
+- Fix ARM64 SIGBUS crashes caused by misaligned QDS structures.
+- Fix Windows Debug SDK DLL linker errors caused by mismatched C runtime libraries.
+
+### Improvements
+
+- Unify C and C++ API export declarations in the C-compatible `qmdc_export.h` header.
+- Improve libusb hotplug handling and device-context ownership.
+
+---
+
 ## v1.2.4
 ### Features
 - Device parameter is now optional. Crash collection automatically detects and collects from a single crashed device.
